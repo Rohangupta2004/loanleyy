@@ -20,9 +20,16 @@
  * mandatory co-borrower for education loans. Where a criterion is published
  * but the borrower hasn't given us the matching figure, the row carries an
  * explicit "unverified" caveat instead of quietly passing the check.
+ *
+ * A personal-loan criterion may instead come from Loanley's desk credit-policy
+ * record (lib/policy-rules.ts), because lenders publish rate cards rather than
+ * approval rules. Those criteria are named on the product in
+ * `criteriaFromDeskPolicy`, and every reason below says which of the two a rule
+ * came from, so a desk rule is never read as one the lender published.
  */
 import { LENDER_DB } from '../data/lenders';
 import type { EmploymentType, Lender, LenderProduct, LoanProductType } from '../data/lenders';
+import { isDeskPolicyCriterion } from './policy-rules';
 
 export type CreditBand = 'below_650' | '650_700' | '700_750' | '750_plus' | 'unknown';
 
@@ -127,6 +134,17 @@ function joinWithAnd(parts: string[]): string {
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
 
+/**
+ * Where one criterion came from. A borrower has to be able to tell a figure the
+ * lender printed from one on Loanley's desk record, because only the first can
+ * be checked against the source link on the row.
+ */
+function criterionSource(product: LenderProduct, field: string): string {
+  return isDeskPolicyCriterion(product, field)
+    ? "Loanley's desk policy record"
+    : "the lender's published criteria";
+}
+
 /** Standard reducing-balance EMI. */
 export function computeEmi(principal: number, annualRatePct: number, months: number): number {
   const r = annualRatePct / 12 / 100;
@@ -228,36 +246,40 @@ export function compareLenders(req: BorrowerRequirements, source: LenderSource =
     const notes: string[] = [];
 
     if (!product.employmentTypes.includes(req.employmentType)) {
+      const onlyFor = req.employmentType === 'self_employed' ? 'salaried' : 'self-employed';
       reasons.push(
-        req.employmentType === 'self_employed'
-          ? 'This product is published for salaried applicants only'
-          : 'This product is published for self-employed applicants only',
+        `This product is for ${onlyFor} applicants only, per ${criterionSource(product, 'employmentTypes')}`,
       );
     }
     if (req.amount < product.minLoanAmount) {
-      reasons.push(`Amount below the published minimum (₹${product.minLoanAmount.toLocaleString('en-IN')})`);
+      reasons.push(
+        `Amount below the minimum on ${criterionSource(product, 'minLoanAmount')} (₹${product.minLoanAmount.toLocaleString('en-IN')})`,
+      );
     }
     if (req.amount > product.maxLoanAmount) {
       reasons.push(`Amount above the published maximum (₹${product.maxLoanAmount.toLocaleString('en-IN')})`);
     }
     if (req.tenureMonths < product.minTenureMonths) {
-      reasons.push(`Tenure shorter than the published minimum (${product.minTenureMonths} months)`);
+      reasons.push(
+        `Tenure shorter than the minimum on ${criterionSource(product, 'minTenureMonths')} (${product.minTenureMonths} months)`,
+      );
     }
     if (req.tenureMonths > product.maxTenureMonths) {
-      reasons.push(`Tenure longer than the published maximum (${product.maxTenureMonths} months)`);
+      reasons.push(
+        `Tenure longer than the maximum on ${criterionSource(product, 'maxTenureMonths')} (${product.maxTenureMonths} months)`,
+      );
     }
 
     // Income eligibility applies to BOTH salaried and self-employed applicants:
     // a published minimum income is a minimum income, whichever way it is earned.
     if (product.minSalary != null) {
       const incomeWord = req.employmentType === 'salaried' ? 'salary' : 'income';
+      const floor = `minimum monthly ${incomeWord} ₹${product.minSalary.toLocaleString('en-IN')} per ${criterionSource(product, 'minSalary')}`;
       if (req.monthlyIncome == null) {
-        notes.push(
-          `Requires minimum monthly ${incomeWord} ₹${product.minSalary.toLocaleString('en-IN')} — you haven't shared your income, so this is unverified`,
-        );
+        notes.push(`Requires ${floor} — you haven't shared your income, so this is unverified`);
       } else if (req.monthlyIncome < product.minSalary) {
         reasons.push(
-          `Requires minimum monthly ${incomeWord} ₹${product.minSalary.toLocaleString('en-IN')} — your income is ₹${req.monthlyIncome.toLocaleString('en-IN')}`,
+          `Requires ${floor} — your income is ₹${req.monthlyIncome.toLocaleString('en-IN')}`,
         );
       }
     }

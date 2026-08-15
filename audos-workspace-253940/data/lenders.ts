@@ -52,6 +52,13 @@ export interface LenderProduct {
   institutionRequirement?: string;
   /** Date the eligibility fields above were last verified on the lender's page. */
   eligibilityCheckedOn?: string;
+  /**
+   * Criteria on this product that came from Loanley's desk credit-policy record
+   * (data/policy_rules.json) rather than the lender's published page — lenders
+   * publish rate cards, not approval rules. Anything named here must be
+   * described to a borrower as desk policy, never as a published figure.
+   */
+  criteriaFromDeskPolicy?: string[];
   sourceUrl: string;
   dataNote?: string;
 }

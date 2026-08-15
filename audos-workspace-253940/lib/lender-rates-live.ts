@@ -14,6 +14,12 @@
  * the ranking against. A weekly override refreshes a value inside that
  * dataset; it never stands in for it.
  *
+ * The approval criteria are then set from Loanley's desk credit-policy record
+ * (data/policy_rules.json, via lib/policy-rules.ts), because lenders publish
+ * rate cards rather than approval rules. That layer sets no rate and no fee, so
+ * it cannot reorder the ranking — it only decides who qualifies, and every
+ * criterion it sets is labelled as desk policy where the borrower reads it.
+ *
  * Every customer surface must get its lenders from here (`useLiveLenderDb()`)
  * and hand the result to `compareLenders(req, data)` — never read
  * `lender_rate_overrides` directly, or the validation below is bypassed and the
@@ -37,6 +43,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LENDER_DB } from '../data/lenders';
 import type { Lender, LenderProduct, LoanProductType } from '../data/lenders';
 import { applyPersonalLoanSource } from './personal-loan-source';
+import { applyPolicyRules } from './policy-rules';
 
 /** WorkspaceDB table the weekly refresh writes. */
 export const RATE_OVERRIDE_TABLE = 'lender_rate_overrides';
@@ -202,7 +209,7 @@ function mergeProduct(base: LenderProduct, row: RateOverrideRow): ProductMerge {
  * lenders and products the bundle doesn't carry.
  */
 export function mergeRateOverrides(rows: RateOverrideRow[] | null | undefined): LiveLenderData {
-  const source = applyPersonalLoanSource(LENDER_DB);
+  const source = applyPolicyRules(applyPersonalLoanSource(LENDER_DB));
   const bundled: LiveLenderData = {
     lenders: source.lenders,
     lastUpdated: source.lastUpdated,

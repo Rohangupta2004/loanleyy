@@ -1,5 +1,5 @@
 <!-- __compiler_v:5 -->
-<!-- AUDOS_PUBLISH_TOKEN:01d3fefc-ab42-450b-895a-75735547c6df -->
+<!-- AUDOS_PUBLISH_TOKEN:fcb5d2d1-85b6-4194-8e07-8806953fd024 -->
 <!DOCTYPE html>
 <html lang="en" class="light">
   <head>
@@ -974,6 +974,9 @@ video {
 .h-2 {
   height: 0.5rem;
 }
+.h-2\.5 {
+  height: 0.625rem;
+}
 .h-3 {
   height: 0.75rem;
 }
@@ -1057,6 +1060,9 @@ video {
 }
 .w-2 {
   width: 0.5rem;
+}
+.w-2\.5 {
+  width: 0.625rem;
 }
 .w-28 {
   width: 7rem;
@@ -1159,6 +1165,10 @@ video {
 }
 .-translate-y-1\/2 {
   --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.rotate-180 {
+  --tw-rotate: 180deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .transform {
@@ -1282,6 +1292,9 @@ video {
 }
 .gap-y-1 {
   row-gap: 0.25rem;
+}
+.gap-y-1\.5 {
+  row-gap: 0.375rem;
 }
 .gap-y-2 {
   row-gap: 0.5rem;
@@ -2623,6 +2636,10 @@ body {
 
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .sm\:grid-cols-4 {
@@ -4162,10 +4179,10 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/loan-benchmarks.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/loan-benchmarks.ts
 var RBI_BENCHMARK_RANGES, RBI_MASTER_DIRECTIONS_URL;
 var init_loan_benchmarks = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/lib/loan-benchmarks.ts"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/lib/loan-benchmarks.ts"() {
     RBI_BENCHMARK_RANGES = {
       personal: { minPct: 10, maxPct: 24 },
       home: { minPct: 8, maxPct: 12 },
@@ -4177,7 +4194,7 @@ var init_loan_benchmarks = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/LoanleyCards.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/LoanleyCards.tsx
 import { useState as useState2 } from "react";
 import {
   Calculator,
@@ -4581,7 +4598,7 @@ function LoanleyResultCard({ raw }) {
 }
 var LOAN_TYPES, LENDER_SHORT_NAMES;
 var init_LoanleyCards = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/components/LoanleyCards.tsx"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/components/LoanleyCards.tsx"() {
     init_loan_benchmarks();
     LOAN_TYPES = [
       { value: "personal", label: "Personal Loan" },
@@ -4603,10 +4620,10 @@ var init_LoanleyCards = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/data/lenders.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/data/lenders.ts
 var LENDER_DB;
 var init_lenders = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/data/lenders.ts"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/data/lenders.ts"() {
     LENDER_DB = {
       name: "Loanley India lender database",
       description: "Published interest rates, fees and eligibility criteria for major Indian banks and NBFCs. Sourced from each lender's official rate card and RBI disclosures. This file is the single source of truth \u2014 scripts/scrape-lenders.js refreshes it weekly and regenerates data/lenders.ts for the app bundle.",
@@ -5899,7 +5916,7 @@ var init_lenders = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/lender-compare.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/lender-compare.ts
 function describeMonths(months) {
   if (months >= 12 && months % 12 === 0) {
     const years = months / 12;
@@ -6108,7 +6125,7 @@ function compareLenders(req, source = LENDER_DB) {
 }
 var CREDIT_BAND_LABELS, CREDIT_BAND_FLOOR, LOAN_TYPE_LABELS, LENDER_TYPE_LABELS;
 var init_lender_compare = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/lib/lender-compare.ts"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/lib/lender-compare.ts"() {
     init_lenders();
     CREDIT_BAND_LABELS = {
       below_650: "Below 650",
@@ -6138,7 +6155,136 @@ var init_lender_compare = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/lender-rates-live.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/data/personal-loans-data.ts
+function personalLoansJson() {
+  return `${JSON.stringify(PERSONAL_LOANS, null, 2)}
+`;
+}
+var PERSONAL_LOANS, PERSONAL_LOANS_SCRAPED_AT;
+var init_personal_loans_data = __esm({
+  "../../../tmp/space-workspace-253940-SkdnUX/data/personal-loans-data.ts"() {
+    PERSONAL_LOANS = [
+      { "lender": "State Bank of India", "code": "SBI", "lenderId": "sbi", "lenderType": "public_sector_bank", "loanType": "personal", "interestRateMin": 10, "interestRateMax": 15, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 1.5, "processingFeeFlat": null, "processingFeeMin": 1e3, "processingFeeMax": 15e3, "processingFeeNote": "Up to 1.50% of the loan amount + GST, minimum \u20B91,000 and maximum \u20B915,000. 100% waiver for Defence and Platinum/Rhodium salary-package customers; 50% waiver for Government employees and for a CIC score of 800 or above.", "prepaymentCharges": null, "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": null, "ageMax": null, "foirMax": 0.65, "negativeIndustries": null, "documents": null, "sourceUrl": "https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/personal-loans-schemes", "eligibilitySourceUrl": "https://sbi.co.in/web/personal-banking/loans/personal-loans/sbi-personal-loan", "sourceUrls": ["https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/personal-loans-schemes", "https://sbi.co.in/web/personal-banking/loans/personal-loans/sbi-personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rate published as 2-year MCLR 8.75% plus a 1.25%\u20136.25% spread, effective 10.00%\u201315.00% p.a. as on 01.04.2026. Salaried only, and only for customers holding an SBI salary package account. SBI publishes an EMI/NMI ceiling of 65% rather than a minimum CIBIL score. SBI's pages are rendered client-side, so the eligibility tabs (minimum salary, tenure band, document list) could not be read by the crawler this run and are left null rather than guessed.", "unpublishedFields": ["loanAmountMin", "tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "prepaymentCharges", "cibilScoreMin", "minSalaryMonthly", "ageMin", "ageMax", "negativeIndustries", "documents"], "processingFeeCapAmount": 15e3 },
+      { "lender": "HDFC Bank", "code": "HDFC", "lenderId": "hdfc-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 9.99, "interestRateMax": 24, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": 12, "tenureMaxMonths": 60, "processingFeePercent": null, "processingFeeFlat": 6500, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to \u20B96,500 + GST, non-refundable even if the loan is later cancelled or rebooked.", "prepaymentCharges": "Foreclosure on principal outstanding: 4% up to 24 EMIs, 3% after 24 and up to 36 EMIs, 2% after 36 EMIs. Part-payment allowed after the first EMI, up to 25% of principal outstanding, once a financial year and twice in the loan tenure, at the same percentages.", "cibilScoreMin": null, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/interest-rates-and-charges", "eligibilitySourceUrl": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/eligibility", "sourceUrls": ["https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan", "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/interest-rates-and-charges", "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/eligibility"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rack rate for salaried applicants is published as 9.99%\u201324.00%; HDFC also publishes actual Q1 FY2026-27 disbursals of 9.97%\u201324.06% IRR (average 10.89%). Loans up to \u20B950 lakh, and up to \u20B975 lakh subject to eligibility norms. Self-employed applicants are explicitly not eligible for this product. No minimum CIBIL is published as a rule \u2014 the FAQ calls a score above 720 'ideal', so no floor is stored. Under the Golden Edge programme foreclosure is free after 12 EMIs for customers with income \u2265 \u20B975,000 and a loan above \u20B915 lakh.", "unpublishedFields": ["loanAmountMin", "processingFeePercent", "cibilScoreMin", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "ICICI Bank", "code": "ICICI", "lenderId": "icici-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 9.99, "interestRateMax": 16.5, "loanAmountMin": null, "loanAmountMax": null, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 2, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 2% + taxes.", "prepaymentCharges": "3% of the outstanding principal amount; nil after 24 EMIs have been paid.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": null, "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.icicibank.com/personal-banking/loans/personal-loan/personal-loan-interest-rates", "eligibilitySourceUrl": "https://www.icicibank.com/personal-banking/loans/personal-loan", "sourceUrls": ["https://www.icicibank.com/personal-banking/loans/personal-loan/personal-loan-interest-rates", "https://www.icicibank.com/personal-banking/loans/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rate is published as 1-year MCLR 8.40% plus a 1.59%\u20138.10% spread, effective 9.99%\u201316.50% p.a., with a published April\u2013June 2026 mean of 11.45%. ICICI's product and eligibility pages are rendered client-side and publish no loan amount band, tenure band, minimum salary or minimum CIBIL in crawlable text, so those fields are left null.", "unpublishedFields": ["loanAmountMin", "loanAmountMax", "tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "employmentTypes", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Axis Bank", "code": "AXIS", "lenderId": "axis-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 8.9, "interestRateMax": 21.55, "loanAmountMin": 5e4, "loanAmountMax": 5e6, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 2, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 2% of the loan amount + GST.", "prepaymentCharges": "Foreclosure on principal outstanding \u2014 disbursed amount below \u20B910 lakh: 3% up to 36 paid EMIs, 2% after. \u20B910 lakh and above from own funds: 3% before 12 paid EMIs, nil after. Part payment: 3% up to 36 paid EMIs, 2% after; up to 25% of principal outstanding a year is free after 12 paid EMIs.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": null, "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.axis.bank.in/loans/personal-loan/interest-rates-charges", "eligibilitySourceUrl": "https://www.axis.bank.in/loans/personal-loan", "sourceUrls": ["https://www.axis.bank.in/loans/personal-loan/interest-rates-charges", "https://www.axis.bank.in/loans/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Axis publishes the product as fixed-rate 3-year MCLR 8.90% plus a 0%\u201312.65% spread, effective 8.90%\u201321.55% p.a. with no reset; the same page reports actual April\u2013June 2026 disbursals of 8.75%\u201321.55% (mean 13.07%), while the headline banner advertises 'starting at 9.99%'. The wider published MCLR band is stored. No minimum salary or CIBIL score is published on either page.", "unpublishedFields": ["tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "employmentTypes", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Kotak Mahindra Bank", "code": "KOTAK", "lenderId": "kotak-mahindra-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 10.99, "interestRateMax": null, "loanAmountMin": null, "loanAmountMax": 1e7, "tenureMinMonths": 12, "tenureMaxMonths": 72, "processingFeePercent": 5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 5% of the final loan amount plus taxes, non-refundable, deducted at disbursal.", "prepaymentCharges": "Foreclosure and part payment: 4% + taxes up to 3 years, 2% + taxes after 3 years, on the outstanding principal or part-payment amount. No lock-in after the first EMI; part payment is allowed once a financial year up to 20% of principal outstanding.", "cibilScoreMin": null, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.kotak.bank.in/en/personal-banking/loans/personal-loan/fees-and-charges.html", "eligibilitySourceUrl": "https://www.kotak.bank.in/en/personal-banking/loans/personal-loan/eligibility.html", "sourceUrls": ["https://www.kotak.bank.in/en/personal-banking/loans/personal-loan/interest-rates.html", "https://www.kotak.bank.in/en/personal-banking/loans/personal-loan/fees-and-charges.html", "https://www.kotak.bank.in/en/personal-banking/loans/personal-loan/eligibility.html", "https://www.kotak.bank.in/en/personal-banking/loans/personal-loan.html"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Kotak publishes a fixed rate 'starting from 10.99% p.a.' and no ceiling, so no maximum is stored. Loans up to \u20B91 crore for 1\u20136 years. Minimum net monthly income is published per segment: \u20B925,000 for Kotak salary-account holders, \u20B930,000 otherwise and \u20B920,000 for Kotak employees \u2014 the \u20B925,000 figure is stored. The eligibility page calls a CIBIL score of 750 'generally considered good' rather than a floor, so no minimum score is stored.", "unpublishedFields": ["interestRateMax", "loanAmountMin", "processingFeeFlat", "cibilScoreMin", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Bajaj Finance", "code": "BAJAJ", "lenderId": "bajaj-finance", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 10, "interestRateMax": 30.5, "loanAmountMin": 4e4, "loanAmountMax": 55e5, "tenureMinMonths": 12, "tenureMaxMonths": 108, "processingFeePercent": 4.13, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 4.13% of the loan amount (inclusive of applicable taxes); Flexi loans carry a separate fee of \u20B91,999 to \u20B918,999.", "prepaymentCharges": "Term loan and Flexi Dropline/Hybrid: up to 4.72% (inclusive of taxes) of the outstanding loan amount on full pre-payment, and of the amount prepaid on part pre-payment. Flexi loans carry no part-prepayment charge.", "cibilScoreMin": 650, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried", "self_employed"], "ageMin": 21, "ageMax": 80, "foirMax": null, "negativeIndustries": null, "documents": ["KYC document (Aadhaar / passport / voter ID / driving licence)", "PAN card", "Employee ID card", "Salary slips - last 3 months", "Bank account statements - last 3 months"], "sourceUrl": "https://www.bajajfinserv.in/personal-loan", "eligibilitySourceUrl": "https://www.bajajfinserv.in/personal-loan-eligibility-and-documents", "sourceUrls": ["https://www.bajajfinserv.in/personal-loan", "https://www.bajajfinserv.in/personal-loan-processing-fees-and-interest-rates", "https://www.bajajfinserv.in/personal-loan-eligibility-and-documents"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rate of interest published as a full range of 10% to 30.5% p.a. CIBIL 650 is published as an eligibility criterion, not a preference, so it is stored as a floor. The published age band runs to 80 years, with the borrower required to be 80 or younger at the end of the tenure. No minimum salary is published.", "unpublishedFields": ["processingFeeFlat", "minSalaryMonthly", "foirMax", "negativeIndustries"], "processingFeeCapAmount": null },
+      { "lender": "Punjab National Bank", "code": "PNB", "lenderId": "pnb", "lenderType": "public_sector_bank", "loanType": "personal", "interestRateMin": 10.25, "interestRateMax": 15.8, "loanAmountMin": null, "loanAmountMax": 2e6, "tenureMinMonths": null, "tenureMaxMonths": 72, "processingFeePercent": null, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": null, "prepaymentCharges": "NIL", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://pnb.bank.in/Retail-Advances-interst-rate-on-advances-linked-to-mclr.html", "eligibilitySourceUrl": "https://pnb.bank.in/personalloanforpublic.html", "sourceUrls": ["https://pnb.bank.in/Retail-Advances-interst-rate-on-advances-linked-to-mclr.html", "https://pnb.bank.in/personalloanforpublic.html"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "PNB Sahyog Rin (personal loan scheme for public) floating rates run from RLLR+BSP+2.15% (presently 10.25%) for Defence and paramilitary salary-account holders to RLLR+BSP+7.70% (presently 15.80%) for check-off borrowers scoring under 681; fixed-rate options are 1% higher. Quantum is up to 24 times gross monthly salary capped at \u20B920 lakh, repayable within the remaining service period or 72 EMIs, whichever is earlier. Rates are tiered by CIBIL band down to 'below 681', so there is no published cut-off score. Prepayment carries no penalty.", "unpublishedFields": ["loanAmountMin", "tenureMinMonths", "processingFeePercent", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Canara Bank", "code": "CANARA", "lenderId": "canara-bank", "lenderType": "public_sector_bank", "loanType": "personal", "interestRateMin": 9.7, "interestRateMax": 14.7, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": null, "tenureMaxMonths": 84, "processingFeePercent": 0.5, "processingFeeFlat": null, "processingFeeMin": 1e3, "processingFeeMax": 5e3, "processingFeeNote": "0.50% of the loan amount, minimum \u20B91,000 and maximum \u20B95,000 (+ GST); 50% waived during the Retail Loan Festival from 01.07.2026 to 30.09.2026.", "prepaymentCharges": "No pre-payment penalty", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.canarabank.bank.in/pages/interest-rate-range-on-loans", "eligibilitySourceUrl": "https://www.canarabank.bank.in/canara-budget", "sourceUrls": ["https://www.canarabank.bank.in/pages/interest-rate-range-on-loans", "https://www.canarabank.bank.in/canara-budget"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Canara Budget is the bank's personal loan for confirmed salaried employees: 9.70%\u201314.70% on contracted loans w.e.f. 12.12.2025, published mean 11.86%. Quantum is 25 months' gross salary, capped at \u20B950 lakh under Canara Budget Prime (government, defence, PSU) and \u20B940 lakh under Canara Budget Delight (corporates and institutions) \u2014 the higher cap is stored. Repayable in up to 84 EMIs. Instead of a salary floor the bank publishes a net-take-home rule: at least 25% of gross salary or \u20B910,000 a month, whichever is higher, after all instalments.", "unpublishedFields": ["loanAmountMin", "tenureMinMonths", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": 5e3 },
+      { "lender": "IndusInd Bank", "code": "INDUSIND", "lenderId": "indusind-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 10.49, "interestRateMax": null, "loanAmountMin": 3e4, "loanAmountMax": 5e6, "tenureMinMonths": 12, "tenureMaxMonths": 84, "processingFeePercent": 3.5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 3.5% of the loan amount plus documentation charges, deducted at disbursal.", "prepaymentCharges": null, "cibilScoreMin": 730, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried", "self_employed"], "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.indusind.com/in/en/personal/loans/personal-loan.html", "eligibilitySourceUrl": "https://www.indusind.com/in/en/personal/loans/personal-loan.html", "sourceUrls": ["https://www.indusind.com/in/en/personal/loans/personal-loan.html"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rates start at 10.49% p.a. with no published ceiling. Instant personal loans run from \u20B930,000 to \u20B95 lakh over 12\u201348 months; above \u20B95 lakh the bank lends up to \u20B950 lakh for up to 84 months with fuller documentation. The FAQ states a minimum CIBIL score of 730 is required, so it is stored as a floor. Salaried applicants need \u20B925,000 net monthly income; self-employed applicants are assessed on age 25\u201365 and annual net income of at least \u20B94.8 lakh, and no salaried age band is published.", "unpublishedFields": ["interestRateMax", "processingFeeFlat", "prepaymentCharges", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Yes Bank", "code": "YESBANK", "lenderId": "yes-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 10.85, "interestRateMax": 21, "loanAmountMin": null, "loanAmountMax": null, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 2.5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 2.5% of the loan proceeds.", "prepaymentCharges": null, "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": null, "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.yesbank.in/personal-banking/loans/personal-loan/interest-rates", "eligibilitySourceUrl": "https://www.yesbank.in/personal-banking/loans/personal-loan", "sourceUrls": ["https://www.yesbank.in/personal-banking/loans/personal-loan/interest-rates", "https://www.yesbank.in/personal-banking/loans/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Yes Bank publishes a full 10.85%\u201321% p.a. range and processing charges of up to 2.5%, plus stamp duty as per state law. The product page itself renders no crawlable content, so loan amount, tenure, minimum income, age and CIBIL criteria are not stored \u2014 the bank does not publish them in readable text on the pages scraped.", "unpublishedFields": ["loanAmountMin", "loanAmountMax", "tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "prepaymentCharges", "cibilScoreMin", "minSalaryMonthly", "employmentTypes", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "IDFC FIRST Bank", "code": "IDFCFIRST", "lenderId": "idfc-first-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 9.99, "interestRateMax": null, "loanAmountMin": 5e4, "loanAmountMax": 15e5, "tenureMinMonths": 9, "tenureMaxMonths": 60, "processingFeePercent": 2, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "2% on FIRSTmoney (from 0% on select loan amounts), against up to 4% on traditional personal loans.", "prepaymentCharges": "Zero foreclosure and zero prepayment charges", "cibilScoreMin": 710, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried", "self_employed"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.idfcfirstbank.com/personal-banking/loans/personal-loan/personal-loan-interest-rates", "eligibilitySourceUrl": "https://www.idfcfirstbank.com/personal-banking/loans/personal-loan", "sourceUrls": ["https://www.idfcfirstbank.com/personal-banking/loans/personal-loan", "https://www.idfcfirstbank.com/personal-banking/loans/personal-loan/personal-loan-interest-rates"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "FIRSTmoney Smart Personal Loan: \u20B950,000 to \u20B915 lakh, 9 to 60 months, rates from 9.99% p.a. on a reducing balance with no published ceiling, and explicitly zero foreclosure or prepayment charges. The bank states the applicant's CIBIL score should be 710 or more, so it is stored as a floor, and publishes a \u20B925,000 minimum monthly salary.", "unpublishedFields": ["interestRateMax", "processingFeeFlat", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Federal Bank", "code": "FEDERAL", "lenderId": "federal-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 11.99, "interestRateMax": 17.99, "loanAmountMin": null, "loanAmountMax": null, "tenureMinMonths": null, "tenureMaxMonths": 60, "processingFeePercent": null, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": null, "prepaymentCharges": "Prepayment allowed in part or in full; the charge is not published on the personal loan pages.", "cibilScoreMin": null, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried"], "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.federalbank.co.in/personal-loan-interest-rates", "eligibilitySourceUrl": "https://www.federalbank.co.in/fedpremia", "sourceUrls": ["https://www.federalbank.co.in/personal-loan-interest-rates", "https://www.federalbank.co.in/fedpremia", "https://www.federalbank.co.in/personal-loans"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Federal Bank's two official pages disagree on the floor: the rate-card page publishes 'Personal Loan \u2014 onwards 11.99%', while the FedPremia FAQ publishes a range of 10.49% to 17.99% p.a. The higher, more conservative floor and the published ceiling are stored together. FedPremia is for salaried applicants earning at least \u20B925,000 a month, with a maximum tenure of 60 months.", "unpublishedFields": ["loanAmountMin", "loanAmountMax", "tenureMinMonths", "processingFeePercent", "processingFeeFlat", "cibilScoreMin", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "RBL Bank", "code": "RBL", "lenderId": "rbl-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 18, "interestRateMax": 18, "loanAmountMin": 3e4, "loanAmountMax": 5e5, "tenureMinMonths": 12, "tenureMaxMonths": 36, "processingFeePercent": 2, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "2% of the loan value, deducted at disbursement.", "prepaymentCharges": "5% of the outstanding principal if foreclosed within the first 18 EMIs, 3% after 18 EMIs. Nil if at least 12 EMIs have been paid without a bounce and the closure is from own funds \u2014 a balance transfer does not count as own funds.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": 25, "ageMax": 55, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.rblbank.com/personal-banking/loans/personal-loan", "eligibilitySourceUrl": "https://www.rblbank.com/personal-banking/loans/personal-loan", "sourceUrls": ["https://www.rblbank.com/personal-banking/loans/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "RBL publishes a single flat rate of 18% p.a. rather than a range. The offer is limited to existing customers holding a salary or savings account, from \u20B930,000 to \u20B95 lakh over 12\u201336 months, with the borrower aged 25 to 55 at onboarding. No minimum salary or CIBIL score is published.", "unpublishedFields": ["processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Tata Capital", "code": "TATACAPITAL", "lenderId": "tata-capital", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 10.99, "interestRateMax": 29.99, "loanAmountMin": 4e4, "loanAmountMax": 35e5, "tenureMinMonths": 12, "tenureMaxMonths": 72, "processingFeePercent": 5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 5% of the loan amount + GST on the product page; the rates page shows up to 3% + GST for some profiles, plus documentation charges of up to \u20B91,000 + GST.", "prepaymentCharges": "Part prepayment of up to 25% of the disbursed amount is free at any time. Beyond that: 6.5% of the amount prepaid within 12 months of first disbursement, 4.5% after. Foreclosure: 6.5% of principal outstanding within 12 months, 4.5% after. Zero on floating-rate loans to individuals.", "cibilScoreMin": null, "minSalaryMonthly": 15e3, "minSalary": 15e3, "employmentTypes": ["salaried", "self_employed"], "ageMin": 21, "ageMax": 58, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.tatacapital.com/personal-loan/rates-and-charges.html", "eligibilitySourceUrl": "https://www.tatacapital.com/personal-loan.html", "sourceUrls": ["https://www.tatacapital.com/personal-loan.html", "https://www.tatacapital.com/personal-loan/rates-and-charges.html", "https://www.tatacapital.com/personal-loan/documents-required.html"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Published range is 10.99% to 29.99% p.a. Salaried applicants: age 21\u201358, minimum monthly income \u20B915,000 (\u20B925,000 in metros). Self-employed: age 25\u201365, minimum annual income \u20B93 lakh and three years of business vintage. Tata Capital's wording on credit score is inconsistent \u2014 the product page says loans go to individuals 'with a credit score of 725 and above' while the eligibility list says '725+ preferred' \u2014 so no hard floor is stored.", "unpublishedFields": ["processingFeeFlat", "cibilScoreMin", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "L&T Finance", "code": "LTFINANCE", "lenderId": "lt-finance", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 10.5, "interestRateMax": null, "loanAmountMin": null, "loanAmountMax": 3e6, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 4, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 4% of the loan amount, deducted upfront before disbursement.", "prepaymentCharges": "Foreclosure charges apply; L&T Finance publishes that the exact percentage is set in the individual loan agreement.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": null, "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.ltfinance.com/personal-loan-interest-rate", "eligibilitySourceUrl": "https://www.ltfinance.com/personal-loan", "sourceUrls": ["https://www.ltfinance.com/personal-loan-interest-rate", "https://www.ltfinance.com/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "The rate page headline reads 'starting @11%' but the published rate table on the same page gives a minimum interest rate of 10.50% and states the maximum is 'as applicable to your profile' \u2014 the table figure is stored and no ceiling is recorded. Loans up to \u20B930 lakh. No minimum salary, age band, tenure band or CIBIL floor is published.", "unpublishedFields": ["interestRateMax", "loanAmountMin", "tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "employmentTypes", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Muthoot Finance", "code": "MUTHOOT", "lenderId": "muthoot-finance", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 13.5, "interestRateMax": null, "loanAmountMin": null, "loanAmountMax": 2e6, "tenureMinMonths": null, "tenureMaxMonths": 60, "processingFeePercent": null, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": null, "prepaymentCharges": null, "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": null, "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.muthootfinance.com/personal-loan", "eligibilitySourceUrl": "https://www.muthootfinance.com/personal-loan", "sourceUrls": ["https://www.muthootfinance.com/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Muthoot publishes interest rates 'starting at just 13.5% p.a.' with no ceiling, personal loans up to \u20B920 lakh and a maximum tenure of five years, and an age band of 21 to 60. It states only that a 'good credit score' is assessed and that processing charges are 'decided from time to time', so no CIBIL floor and no processing fee are stored.", "unpublishedFields": ["interestRateMax", "loanAmountMin", "tenureMinMonths", "processingFeePercent", "processingFeeFlat", "prepaymentCharges", "cibilScoreMin", "minSalaryMonthly", "employmentTypes", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Aditya Birla Finance", "code": "ABFL", "lenderId": "aditya-birla-finance", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 10, "interestRateMax": 28, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": 12, "tenureMaxMonths": 84, "processingFeePercent": 4, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 4% of the loan sanctioned amount.", "prepaymentCharges": "Part-prepayment: up to 7% of the amount prepaid within 13 months of disbursal, up to 6% between 13 and 25 months, up to 5% after 25 months, with up to 20% of principal outstanding a year permitted. Foreclosure follows the same 7% / 6% / 5% schedule on principal outstanding. Fixed-rate loans only.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": ["Identity proof (Aadhaar / PAN / passport / voter ID)", "Address proof (utility bill, Aadhaar, passport or rental agreement)", "Salary slips - last 3 months", "Bank statements - last 6 months showing salary credits", "Passport-size photograph"], "sourceUrl": "https://www.adityabirlacapital.com/loans/personal-finance/personal-loan/interest-rates", "eligibilitySourceUrl": "https://www.adityabirlacapital.com/loans/personal-finance/personal-loan", "sourceUrls": ["https://www.adityabirlacapital.com/loans/personal-finance/personal-loan", "https://www.adityabirlacapital.com/loans/personal-finance/personal-loan/interest-rates"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "The published indicative range of rate of interest is 10% to 28% p.a. Loans up to \u20B950 lakh for 1 to 7 years, for salaried employees aged 21 to 60. A CIBIL score of 750 or more is described as helping quicker approval and better terms rather than as a cut-off, so no floor is stored. No minimum salary is published.", "unpublishedFields": ["loanAmountMin", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "foirMax", "negativeIndustries"], "processingFeeCapAmount": null },
+      { "lender": "Shriram Finance", "code": "SHRIRAM", "lenderId": "shriram-finance", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 11, "interestRateMax": null, "loanAmountMin": null, "loanAmountMax": 1e6, "tenureMinMonths": 12, "tenureMaxMonths": 60, "processingFeePercent": 5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to 5% of the loan amount.", "prepaymentCharges": "Up to 4% foreclosure charge, with no foreclosure permitted within 12 months of the first EMI. An additional 2% applies if the loan is transferred to another financial institution.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried", "self_employed"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": ["KYC documents (Aadhaar, passport, driving licence or voter ID)", "Address proof (utility bill, rental agreement or passport)", "Income proof - last 3 months", "Bank statements - last 6 months", "Cancelled cheque and eNACH mandate form"], "sourceUrl": "https://www.shriramfinance.in/personal-loan", "eligibilitySourceUrl": "https://www.shriramfinance.in/personal-loan", "sourceUrls": ["https://www.shriramfinance.in/personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Shriram publishes rates 'starting at 11% p.a.' with no ceiling, loans up to \u20B910 lakh over 12 to 60 months, and an age band of 21 at application to 60 at loan closure. Self-employed applicants qualify only as pre-approved customers with an existing Shriram relationship, or are directed to a business loan instead. No minimum salary or CIBIL score is published.", "unpublishedFields": ["interestRateMax", "loanAmountMin", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "foirMax", "negativeIndustries"], "processingFeeCapAmount": null },
+      { "lender": "Poonawalla Fincorp", "code": "POONAWALLA", "lenderId": "poonawalla-fincorp", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 9.99, "interestRateMax": null, "loanAmountMin": 1e5, "loanAmountMax": 5e6, "tenureMinMonths": 12, "tenureMaxMonths": 84, "processingFeePercent": 4, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Published as up to 4% plus applicable taxes in the rate table; the feature summary on the same page quotes a 0%\u20133% band.", "prepaymentCharges": "Before the first 6 EMIs: 4% of the amount prepaid + taxes, including balance transfer. After 6 EMIs: nil from the borrower's own funds, 4% from other sources including a balance transfer.", "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried", "self_employed"], "ageMin": null, "ageMax": null, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://poonawallafincorp.com/personal-loan/interest-rate-and-charges/", "eligibilitySourceUrl": "https://poonawallafincorp.com/personal-loan/", "sourceUrls": ["https://poonawallafincorp.com/personal-loan/interest-rate-and-charges/", "https://poonawallafincorp.com/personal-loan/"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Published rate is '9.99% p.a. onwards' with no ceiling, for loans of \u20B91 lakh to \u20B950 lakh over 12 to 84 months, for salaried and self-employed applicants. No minimum salary, age band or CIBIL floor is published on the rate and charges page.", "unpublishedFields": ["interestRateMax", "processingFeeFlat", "cibilScoreMin", "minSalaryMonthly", "ageMin", "ageMax", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
+      { "lender": "Hero FinCorp", "code": "HEROFINCORP", "lenderId": "hero-fincorp", "lenderType": "nbfc", "loanType": "personal", "interestRateMin": 18, "interestRateMax": null, "loanAmountMin": 5e4, "loanAmountMax": 7e5, "tenureMinMonths": 12, "tenureMaxMonths": 36, "processingFeePercent": 2.5, "processingFeeFlat": null, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Starts from 2.5% of the loan amount + GST.", "prepaymentCharges": "No prepayment charges. Foreclosure: 5% + GST on the outstanding principal.", "cibilScoreMin": null, "minSalaryMonthly": 15e3, "minSalary": 15e3, "employmentTypes": null, "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.herofincorp.com/personal-loan-interest-rates", "eligibilitySourceUrl": "https://www.herofincorp.com/personal-loan-eligibility", "sourceUrls": ["https://www.herofincorp.com/personal-loan-interest-rates", "https://www.herofincorp.com/personal-loan-eligibility", "https://www.herofincorp.com/personal-loans"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Hero FinCorp's rate-card table itself only says 'as per eligibility', but its interest rate calculator and product pages publish a fixed rate starting at 18% p.a. on a reducing balance, so 18% is stored as the floor and no ceiling is recorded. Instant personal loans up to \u20B97 lakh (the application journey quotes \u20B950,000\u2013\u20B95 lakh) over 12 to 36 months, minimum monthly income \u20B915,000, age 21 to 60. A CIBIL score of 725 or above is described as 'preferred', not required, so no floor is stored.", "unpublishedFields": ["interestRateMax", "processingFeeFlat", "cibilScoreMin", "employmentTypes", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null }
+    ];
+    PERSONAL_LOANS_SCRAPED_AT = PERSONAL_LOANS[0].scrapedAt;
+  }
+});
+
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/personal-loan-source.ts
+function databaseId(record) {
+  return LENDER_ID_ALIASES[record.lenderId] ?? record.lenderId;
+}
+function displayNote(record) {
+  const parts = [];
+  if (record.interestRateMax == null && record.interestRateMin != null) {
+    parts.push(
+      `${record.lender} publishes a starting rate of ${record.interestRateMin}% p.a. and no ceiling \u2014 the upper figure shown is from our own rate card, not the lender's.`
+    );
+  }
+  const opening = firstSentence(record.notes);
+  if (opening) parts.push(opening);
+  const text = parts.join(" ").trim();
+  return text.length > 0 ? text : void 0;
+}
+function firstSentence(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return "";
+  const match = trimmed.match(/^[\s\S]*?\.(?=\s+[A-Z₹])/);
+  const sentence = (match ? match[0] : trimmed).trim();
+  if (sentence.length <= 320) return sentence;
+  return `${sentence.slice(0, 300).trimEnd()}\u2026`;
+}
+function mergeProduct(base, record) {
+  const rateMin = record.interestRateMin ?? base.interestRateMin;
+  const rateMax = record.interestRateMax ?? Math.max(base.interestRateMax, rateMin);
+  const merged = {
+    ...base,
+    interestRateMin: rateMin,
+    interestRateMax: rateMax,
+    minLoanAmount: record.loanAmountMin ?? base.minLoanAmount,
+    maxLoanAmount: record.loanAmountMax ?? base.maxLoanAmount,
+    minTenureMonths: record.tenureMinMonths ?? base.minTenureMonths,
+    maxTenureMonths: record.tenureMaxMonths ?? base.maxTenureMonths,
+    employmentTypes: record.employmentTypes ?? base.employmentTypes,
+    sourceUrl: record.sourceUrl || base.sourceUrl,
+    dataNote: displayNote(record) ?? base.dataNote,
+    eligibilityCheckedOn: record.updatedAt
+  };
+  if (record.minSalaryMonthly != null) merged.minSalary = record.minSalaryMonthly;
+  if (record.cibilScoreMin != null) merged.minCreditScore = record.cibilScoreMin;
+  else delete merged.minCreditScore;
+  if (record.processingFeeFlat != null) {
+    merged.processingFeeFlat = record.processingFeeFlat;
+    delete merged.processingFeePercent;
+    delete merged.processingFeeCapAmount;
+  } else if (record.processingFeePercent != null) {
+    merged.processingFeePercent = record.processingFeePercent;
+    delete merged.processingFeeFlat;
+    if (record.processingFeeMax != null) merged.processingFeeCapAmount = record.processingFeeMax;
+    else delete merged.processingFeeCapAmount;
+  }
+  return merged;
+}
+function applyPersonalLoanSource(db) {
+  let scrapedLatest = "";
+  const lenders = db.lenders.map((lender) => {
+    const record = BY_DATABASE_ID.get(lender.id);
+    const base = lender.products.personal;
+    if (!record || !base) return lender;
+    if (record.updatedAt > scrapedLatest) scrapedLatest = record.updatedAt;
+    return {
+      ...lender,
+      lastUpdated: record.updatedAt > lender.lastUpdated ? record.updatedAt : lender.lastUpdated,
+      products: { ...lender.products, personal: mergeProduct(base, record) }
+    };
+  });
+  return {
+    ...db,
+    lenders,
+    lastUpdated: scrapedLatest > db.lastUpdated ? scrapedLatest : db.lastUpdated
+  };
+}
+var LENDER_ID_ALIASES, BY_DATABASE_ID;
+var init_personal_loan_source = __esm({
+  "../../../tmp/space-workspace-253940-SkdnUX/lib/personal-loan-source.ts"() {
+    init_personal_loans_data();
+    LENDER_ID_ALIASES = {
+      "icici-bank": "icici",
+      "axis-bank": "axis",
+      "kotak-mahindra-bank": "kotak",
+      "indusind-bank": "indusind",
+      "idfc-first-bank": "idfc-first",
+      "federal-bank": "federal",
+      "rbl-bank": "rbl",
+      "canara-bank": "canara",
+      "bajaj-finance": "bajaj-finserv"
+    };
+    BY_DATABASE_ID = new Map(
+      PERSONAL_LOANS.map((record) => [databaseId(record), record])
+    );
+  }
+});
+
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/lender-rates-live.ts
 import { useEffect as useEffect2, useMemo, useState as useState3 } from "react";
 function toNum(value) {
   if (value == null || value === "") return null;
@@ -6180,7 +6326,7 @@ function compareRowRecency(a, b) {
   if (byTime !== 0) return byTime;
   return (toNum(a.id) ?? 0) - (toNum(b.id) ?? 0);
 }
-function mergeProduct(base, row) {
+function mergeProduct2(base, row) {
   const patch = {};
   let fieldsApplied = 0;
   let fieldsConfirmed = 0;
@@ -6221,9 +6367,10 @@ function mergeProduct(base, row) {
   return { product: { ...base, ...patch }, fieldsApplied, fieldsConfirmed };
 }
 function mergeRateOverrides(rows) {
+  const source = applyPersonalLoanSource(LENDER_DB);
   const bundled = {
-    lenders: LENDER_DB.lenders,
-    lastUpdated: LENDER_DB.lastUpdated,
+    lenders: source.lenders,
+    lastUpdated: source.lastUpdated,
     overriddenFields: 0
   };
   if (!Array.isArray(rows) || rows.length === 0) return bundled;
@@ -6237,8 +6384,8 @@ function mergeRateOverrides(rows) {
   if (newest.size === 0) return bundled;
   let overriddenFields = 0;
   let touchedLenders = 0;
-  let lastUpdated = LENDER_DB.lastUpdated;
-  const lenders = LENDER_DB.lenders.map((lender) => {
+  let lastUpdated = source.lastUpdated;
+  const lenders = source.lenders.map((lender) => {
     const products = { ...lender.products };
     let lenderFields = 0;
     let lenderTouched = false;
@@ -6248,7 +6395,7 @@ function mergeRateOverrides(rows) {
       if (!base) continue;
       const row = newest.get(`${lender.id}|${productType}`);
       if (!row) continue;
-      const merged = mergeProduct(base, row);
+      const merged = mergeProduct2(base, row);
       if (merged.fieldsApplied === 0 && merged.fieldsConfirmed === 0) continue;
       products[productType] = merged.product;
       lenderFields += merged.fieldsApplied;
@@ -6296,8 +6443,9 @@ function useLiveLenderDb() {
 }
 var RATE_OVERRIDE_TABLE, RATE_PLAUSIBLE_MIN_PCT, RATE_PLAUSIBLE_MAX_PCT, FEE_PLAUSIBLE_MAX_PCT, OVERRIDE_ROW_LIMIT, ISO_DATE_RE, cachedRows, inFlight;
 var init_lender_rates_live = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/lib/lender-rates-live.ts"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/lib/lender-rates-live.ts"() {
     init_lenders();
+    init_personal_loan_source();
     RATE_OVERRIDE_TABLE = "lender_rate_overrides";
     RATE_PLAUSIBLE_MIN_PCT = 4;
     RATE_PLAUSIBLE_MAX_PCT = 40;
@@ -6309,7 +6457,7 @@ var init_lender_rates_live = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/apps/LoanCheck/App.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/apps/LoanCheck/App.tsx
 var App_exports = {};
 __export(App_exports, {
   default: () => LoanCheck
@@ -6590,7 +6738,7 @@ function SourceCitation({ row, tone = "light" }) {
       children: [
         "Source: ",
         shortLenderName(row.lenderName),
-        " official rate card"
+        " official page \u2197"
       ]
     }
   );
@@ -6945,13 +7093,10 @@ function AboutPage() {
 }
 function SourceDataDownload() {
   const [status, setStatus] = useState10("idle");
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setStatus("busy");
     try {
-      const res = await fetch(PL_DATA_ENDPOINT, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error(`source data unavailable (HTTP ${res.status})`);
-      const text = await res.text();
-      const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+      const url = URL.createObjectURL(new Blob([personalLoansJson()], { type: "application/json" }));
       const link = document.createElement("a");
       link.href = url;
       link.download = PL_DATA_FILENAME;
@@ -6980,7 +7125,7 @@ function SourceDataDownload() {
         ]
       }
     ),
-    /* @__PURE__ */ jsx10("p", { className: "mt-0.5 text-[10px] leading-snug text-[var(--space-text-muted)]", children: status === "error" ? "That download didn't go through. Please try again in a moment \u2014 every figure is also cited inline above." : "20 lenders, updated weekly from published rate cards." })
+    /* @__PURE__ */ jsx10("p", { className: "mt-0.5 text-[10px] leading-snug text-[var(--space-text-muted)]", children: status === "error" ? "That download didn't go through. Please try again in a moment \u2014 every figure is also cited inline above." : `${PERSONAL_LOANS.length} lenders \u2014 every figure read off the lender's own official page.` })
   ] });
 }
 function LoanCheck() {
@@ -7428,17 +7573,17 @@ The policy repo rate is ${LENDER_DB.rateContext.rbiRepoRatePct}% as of ${LENDER_
     ] })
   ] });
 }
-var LOAN_MATH_ENDPOINT, PL_DATA_ENDPOINT, PL_DATA_FILENAME, TRUST_HEADER, seq, nextId, userSays, bot, FIELD_ORDER, FIELD_LABELS, MONEY_UNITS, SEEK_PATTERNS, RBI_SOURCE, FAQ, COVERAGE_CAVEATS, OFFER_ORDER, WELCOME, WELCOME_REPLIES, AFTER_RESULT_REPLIES, ABOUT_HEADLINE, ABOUT_PARAGRAPHS, ABOUT_TRUST_LINE, NAV_BUTTON_CLASS;
+var LOAN_MATH_ENDPOINT, PL_DATA_FILENAME, TRUST_HEADER, seq, nextId, userSays, bot, FIELD_ORDER, FIELD_LABELS, MONEY_UNITS, SEEK_PATTERNS, RBI_SOURCE, FAQ, COVERAGE_CAVEATS, OFFER_ORDER, WELCOME, WELCOME_REPLIES, AFTER_RESULT_REPLIES, ABOUT_HEADLINE, ABOUT_PARAGRAPHS, ABOUT_TRUST_LINE, NAV_BUTTON_CLASS;
 var init_App = __esm({
-  "../../../tmp/space-workspace-253940-z9tAor/apps/LoanCheck/App.tsx"() {
+  "../../../tmp/space-workspace-253940-SkdnUX/apps/LoanCheck/App.tsx"() {
     init_LoanleyCards();
     init_lender_compare();
     init_lender_rates_live();
+    init_personal_loans_data();
     init_loan_benchmarks();
     init_lenders();
     LOAN_MATH_ENDPOINT = "/api/hooks/execute/workspace-253940/loan-math";
-    PL_DATA_ENDPOINT = "/api/hooks/execute/workspace-253940/personal-loans-download";
-    PL_DATA_FILENAME = "loanley-pl-data.json";
+    PL_DATA_FILENAME = "personal_loans.json";
     TRUST_HEADER = "No lender has paid for placement. Ranked by effective cost for your profile. Rates sourced from official lender rate cards.";
     seq = 0;
     nextId = () => `m${seq += 1}`;
@@ -7573,7 +7718,7 @@ var init_App = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-z9tAor/main.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/main.tsx
 import React, { Suspense as Suspense2, useState as useState11, useEffect as useEffect9, Component as Component2 } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -7600,7 +7745,7 @@ function resolveCompiledPublicAppId(publicRoute, hash, privateRoute) {
   return null;
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/SpaceRuntimeContext.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/SpaceRuntimeContext.tsx
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { jsx } from "react/jsx-runtime";
 var SpaceRuntimeContext = createContext(null);
@@ -8555,11 +8700,11 @@ function useSpaceRuntime() {
   return context;
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/Desktop.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/Desktop.tsx
 import { useState as useState9, Suspense, useEffect as useEffect7, useRef as useRef5, useMemo as useMemo4, useCallback as useCallback3, Component } from "react";
 import { Bot as Bot2, Check as Check2, Folder as Folder2, X as X3, Plus as Plus2, Menu, PanelLeftClose, PanelLeftOpen, ChevronLeft, Activity, Maximize2, Minimize2, Moon, Heart as Heart2, Calendar, Users, FileText, BarChart, Settings as SettingsIcon, MessageCircle, Plane, TrendingUp, LineChart, Dumbbell, Brain, Target, Zap, Star, Clock as Clock2, CheckCircle, List, BookOpen as BookOpen3, Coffee, Music, Camera, MapPin, Wallet, ShoppingCart, Gift, Lightbulb, Sparkles as Sparkles3, Rocket as Rocket2, Home, Building, Globe, Mail, Phone, Video, Mic, Image, Play, Pause, Volume2, Wifi, Cloud, Sun, Umbrella, Thermometer, Wind, Droplets, Leaf, Flower2, Mountain, Waves, Compass as Compass2, Map as Map2, Navigation, Car, Bike, Ship, Award, Trophy, Medal, Crown, Diamond, Gem, Key, Lock, Unlock, Shield, Eye as Eye3, Search as Search2, Filter, SortAsc, Download, Upload, Share2, Link, ExternalLink as ExternalLink2, Copy, Clipboard, Trash2, Edit as Edit2, Pencil, PenTool, Scissors, Bookmark, Flag, Bell, AlertCircle as AlertCircle2, Info as Info2, HelpCircle, XCircle as XCircle2, CheckCircle2 as CheckCircle24, Circle, Square, Triangle, Hexagon, Octagon, Hash, AtSign, DollarSign, Percent, Calculator as Calculator2, Code, Terminal, Database, Server, Cpu, Monitor, Smartphone, Tablet, Laptop, Watch, Headphones, Speaker, Radio, Tv, Printer, Scan, QrCode, Barcode, CreditCard as CreditCard2, Receipt, Banknote, PiggyBank, TrendingDown, AreaChart, PieChart, Scale as Scale3, Landmark } from "lucide-react";
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
 import {
   Bot,
   Send as Send2,
@@ -8581,7 +8726,7 @@ import { useMemo as useMemo3, useRef as useRef3 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/friendly-terms.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/friendly-terms.ts
 var TOOL_NAME_PREFIX_RE = /^(?:functions\.|tools\.)/;
 var toolNameAliases = {
   "edit_file": "edit",
@@ -8653,7 +8798,7 @@ function getToolColor(toolName) {
   return toolColors[normalizeToolName(toolName)] || "text-gray-500";
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/colors.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/colors.ts
 var brand = {
   // Primary brand color - used for main actions, buttons, links
   primary: {
@@ -8958,10 +9103,10 @@ var settingsStyles = {
   saveButton: (disabled) => `w-full px-4 py-2.5 rounded-lg ${tw.button.primary} flex items-center justify-center gap-2 ${disabled ? tw.button.disabled : ""}`
 };
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
 init_LoanleyCards();
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/LenderCompareCard.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/LenderCompareCard.tsx
 init_LoanleyCards();
 init_lender_compare();
 init_lender_rates_live();
@@ -9345,7 +9490,7 @@ function LoanleyCompareCard({ raw, onSubmit }) {
   );
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
 import { Fragment as Fragment3, jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
 function WorkingIndicator({
   lastAction,
@@ -9899,11 +10044,11 @@ function AgentChatView({ runtime }) {
   );
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/useAgentChatRuntime.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/useAgentChatRuntime.tsx
 import { useState as useState5, useEffect as useEffect3, useRef as useRef4, useCallback as useCallback2 } from "react";
 import { flushSync } from "react-dom";
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/tenant-delegation-scope.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/tenant-delegation-scope.ts
 function getTenantDelegationScope() {
   if (typeof window === "undefined") return null;
   const injected = window.__TENANT_DELEGATION__;
@@ -9935,7 +10080,7 @@ function isTenantChatSuppressed() {
   return scope?.chatSuppressed === true;
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/useAgentChatRuntime.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/useAgentChatRuntime.tsx
 var globalSendingLock = false;
 var lastSendTimestamp = 0;
 var REPLY_STALL_TIMEOUT_MS = 9e4;
@@ -11281,14 +11426,14 @@ function useAgentChatRuntime(props) {
   };
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/AgentChat.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChat.tsx
 import { jsx as jsx5 } from "react/jsx-runtime";
 function AgentChat(props) {
   const runtime = useAgentChatRuntime(props);
   return /* @__PURE__ */ jsx5(AgentChatView, { runtime });
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/FileBrowser.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/FileBrowser.tsx
 import { useState as useState6, useEffect as useEffect4 } from "react";
 import { File as File2, Folder, Eye, Edit } from "lucide-react";
 import { jsx as jsx6, jsxs as jsxs4 } from "react/jsx-runtime";
@@ -11426,7 +11571,7 @@ function FileBrowser({ fileAccessLogs = [] }) {
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/EmailGate.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/EmailGate.tsx
 import { useState as useState7, useEffect as useEffect5 } from "react";
 import {
   ArrowRight,
@@ -12842,7 +12987,7 @@ function EmailGate({
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/components/Settings.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/components/Settings.tsx
 import { useState as useState8, useEffect as useEffect6 } from "react";
 import { Save as Save2, CreditCard, LogOut, Clock, CheckCircle2 as CheckCircle23, AlertCircle, Loader2 as Loader23, ExternalLink, CalendarX } from "lucide-react";
 import { Fragment as Fragment5, jsx as jsx8, jsxs as jsxs6 } from "react/jsx-runtime";
@@ -13306,7 +13451,7 @@ function Settings({ spaceId }) {
   ] }) });
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/tenant-delegation-canvas.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/tenant-delegation-canvas.ts
 function isTenantDelegationCanvas() {
   if (typeof window === "undefined") return false;
   const layout = new URLSearchParams(window.location.search).get("layout");
@@ -13314,7 +13459,7 @@ function isTenantDelegationCanvas() {
   return !!window.__TENANT_DELEGATION__ || !!window.__TENANT_DELEGATION_CANVAS__ || layout === "canvas-only";
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/lib/chat-user-message-event.ts
+// ../../../tmp/space-workspace-253940-SkdnUX/lib/chat-user-message-event.ts
 function listenForChatUserMessages(target, handlers) {
   const onUserMessage = (event) => {
     const detail = event.detail;
@@ -13341,7 +13486,7 @@ function listenForChatUserMessages(target, handlers) {
   return () => target.removeEventListener("audos:chat-user-message", onUserMessage);
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/Desktop.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/Desktop.tsx
 import { Fragment as Fragment6, jsx as jsx9, jsxs as jsxs7 } from "react/jsx-runtime";
 var PRIMARY_THREAD_ID = "main";
 var THREAD_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
@@ -14527,7 +14672,7 @@ function SpaceDesktop({
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-z9tAor/main.tsx
+// ../../../tmp/space-workspace-253940-SkdnUX/main.tsx
 import { Fragment as Fragment8, jsx as jsx11, jsxs as jsxs9 } from "react/jsx-runtime";
 window.React = React;
 var CONFIG = {

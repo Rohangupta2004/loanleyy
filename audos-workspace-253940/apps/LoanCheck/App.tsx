@@ -42,6 +42,12 @@ import {
 } from '../../lib/lender-compare';
 import type { BorrowerRequirements, ComparisonResult, ComparisonRow, CreditBand } from '../../lib/lender-compare';
 import { useLiveLenderDb } from '../../lib/lender-rates-live';
+import {
+  DESK_POLICY_CAVEAT,
+  POLICY_RULES_AWAITING_RATE_CARD,
+  policyRuleFor,
+  policyRuleLines,
+} from '../../lib/policy-rules';
 import { PERSONAL_LOANS, personalLoansJson } from '../../data/personal-loans-data';
 import { RBI_BENCHMARK_RANGES, RBI_MASTER_DIRECTIONS_URL } from '../../lib/loan-benchmarks';
 import { LENDER_DB } from '../../data/lenders';
@@ -584,7 +590,78 @@ function SourceCitation({ row, tone = 'light' }: { row: ComparisonRow; tone?: 'l
   );
 }
 
-function BestMatchCard({ row, tied, asOf }: { row: ComparisonRow; tied: boolean; asOf: string }) {
+/**
+ * The lender's approval rules, from Loanley's desk credit-policy record
+ * (data/policy_rules.json). Behind a disclosure because it is long, and
+ * labelled at the top because these are NOT figures the lender publishes — the
+ * Source link on this row cannot verify them, and the borrower has to know
+ * which of the two they are reading. Personal loans only: the sheet records
+ * personal-loan policy, so it must never be shown against another product.
+ */
+function PolicyRuleCard({
+  lenderId,
+  loanType,
+  tone = 'light',
+}: {
+  lenderId: string;
+  loanType: LoanProductType;
+  tone?: 'light' | 'dark';
+}) {
+  if (loanType !== 'personal') return null;
+  const record = policyRuleFor(lenderId);
+  if (!record) return null;
+  const lines = policyRuleLines(record);
+  if (lines.length === 0) return null;
+
+  const dark = tone === 'dark';
+  const muted = dark ? 'text-[var(--space-brand-primary-100)]' : 'text-[var(--space-text-muted)]';
+  const strong = dark ? 'text-[var(--space-text-on-primary)]' : 'text-[var(--space-text-primary)]';
+
+  return (
+    <details
+      className={`mt-2 rounded-lg border px-2.5 py-1.5 ${
+        dark
+          ? 'border-white/20 bg-white/10'
+          : 'border-[var(--space-border-default)] bg-[var(--space-surface-muted)]'
+      }`}
+      data-testid={`policy-rules-${lenderId}`}
+    >
+      <summary
+        className={`cursor-pointer text-[11px] font-semibold ${
+          dark ? 'text-[var(--space-text-on-primary)]' : 'text-[var(--space-text-brand)]'
+        }`}
+      >
+        Approval rules — what {shortLenderName(record.lender)} actually asks for
+      </summary>
+      <dl className="mt-1.5 grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
+        {lines.map((line) => (
+          <div key={line.label}>
+            <dt className={`text-[10px] ${muted}`}>{line.label}</dt>
+            <dd className={`text-[11px] font-medium leading-snug ${strong}`}>{line.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {record.remark && (
+        <p className={`mt-1.5 text-[10px] leading-snug ${dark ? muted : 'text-[var(--space-text-secondary)]'}`}>
+          Also on file: {record.remark}
+        </p>
+      )}
+      <p className={`mt-1.5 text-[10px] leading-snug ${muted}`}>{DESK_POLICY_CAVEAT}</p>
+    </details>
+  );
+}
+
+function BestMatchCard({
+  row,
+  tied,
+  asOf,
+  loanType,
+}: {
+  row: ComparisonRow;
+  tied: boolean;
+  asOf: string;
+  loanType: LoanProductType;
+}) {
   return (
     <div
       className="overflow-hidden rounded-2xl bg-[var(--space-brand-primary)] p-4 text-[var(--space-text-on-primary)]"
@@ -638,6 +715,7 @@ function BestMatchCard({ row, tied, asOf }: { row: ComparisonRow; tied: boolean;
           ))}
         </ul>
       )}
+      <PolicyRuleCard lenderId={row.lenderId} loanType={loanType} tone="dark" />
       <p className="mt-2">
         <SourceCitation row={row} tone="dark" />
       </p>
@@ -645,7 +723,7 @@ function BestMatchCard({ row, tied, asOf }: { row: ComparisonRow; tied: boolean;
   );
 }
 
-function RankedRow({ row, rank }: { row: ComparisonRow; rank: number }) {
+function RankedRow({ row, rank, loanType }: { row: ComparisonRow; rank: number; loanType: LoanProductType }) {
   return (
     <div
       className="rounded-xl border border-[var(--space-border-default)] bg-[var(--space-surface-card)] px-3 py-2.5"
@@ -693,6 +771,7 @@ function RankedRow({ row, rank }: { row: ComparisonRow; rank: number }) {
               Caveat: {note}
             </p>
           ))}
+          <PolicyRuleCard lenderId={row.lenderId} loanType={loanType} />
           <p className="mt-1">
             <SourceCitation row={row} />
           </p>
@@ -728,7 +807,7 @@ function ResultBlock({ result }: { result: ComparisonResult }) {
   } else if (eligible.length < 3) {
     countLine = `Only ${eligible.length} lender${eligible.length === 1 ? '' : 's'} in our database meet your eligibility criteria. Here's what we found:`;
   } else {
-    countLine = `${eligible.length} lenders in our database meet your published eligibility criteria, ranked by effective cost (EMI plus processing fee).`;
+    countLine = `${eligible.length} lenders in our database meet the eligibility criteria we hold for you, ranked by effective cost (EMI plus processing fee).`;
   }
 
   return (
@@ -749,7 +828,13 @@ function ResultBlock({ result }: { result: ComparisonResult }) {
       {tiedGroup.length > 0 && (
         <div className="space-y-2">
           {tiedGroup.map((row) => (
-            <BestMatchCard key={row.lenderId} row={row} tied={tiedGroup.length > 1} asOf={result.lastUpdated} />
+            <BestMatchCard
+              key={row.lenderId}
+              row={row}
+              tied={tiedGroup.length > 1}
+              asOf={result.lastUpdated}
+              loanType={result.requirements.loanType}
+            />
           ))}
           {tiedGroup.length > 1 && (
             <p className="text-[11px] leading-snug text-[var(--space-text-secondary)]">
@@ -767,7 +852,7 @@ function ResultBlock({ result }: { result: ComparisonResult }) {
           </h4>
           <div className="space-y-2">
             {eligible.map((row, i) => (
-              <RankedRow key={row.lenderId} row={row} rank={i + 1} />
+              <RankedRow key={row.lenderId} row={row} rank={i + 1} loanType={result.requirements.loanType} />
             ))}
           </div>
         </div>
@@ -779,8 +864,9 @@ function ResultBlock({ result }: { result: ComparisonResult }) {
             Likely out of reach for your profile
           </h4>
           <p className="mb-2 text-[11px] leading-snug text-[var(--space-text-secondary)]">
-            Shown so nothing is hidden — these are excluded from the ranking because of each lender's own published
-            criteria. Published criteria aren't the final word; lenders assess full applications individually.
+            Shown so nothing is hidden — these are excluded from the ranking by each lender's own criteria, and every
+            reason below says whether it came from the lender's published page or from Loanley's desk record of its
+            credit policy. Neither is the final word; lenders assess full applications individually.
           </p>
           <div className="space-y-2 opacity-70">
             {result.outOfRange.map((row) => (
@@ -820,6 +906,14 @@ function ResultBlock({ result }: { result: ComparisonResult }) {
       {result.notCovered.length > 0 && (
         <p className="text-[10px] leading-snug text-[var(--space-text-muted)]">
           Not compared (no published rate-card data for this loan type in our database yet): {result.notCovered.join(', ')}.
+        </p>
+      )}
+
+      {result.requirements.loanType === 'personal' && POLICY_RULES_AWAITING_RATE_CARD.length > 0 && (
+        <p className="text-[10px] leading-snug text-[var(--space-text-muted)]">
+          We also hold approval rules for {POLICY_RULES_AWAITING_RATE_CARD.map((record) => record.lender).join(', ')},
+          but they are not ranked here yet: a lender only enters the ranking once its own published rate card has been
+          scraped, and those are still to be collected.
         </p>
       )}
 
