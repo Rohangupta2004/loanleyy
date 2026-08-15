@@ -42,6 +42,7 @@ import {
 } from '../../lib/lender-compare';
 import type { BorrowerRequirements, ComparisonResult, ComparisonRow, CreditBand } from '../../lib/lender-compare';
 import { useLiveLenderDb } from '../../lib/lender-rates-live';
+import { PERSONAL_LOANS, personalLoansJson } from '../../data/personal-loans-data';
 import { RBI_BENCHMARK_RANGES, RBI_MASTER_DIRECTIONS_URL } from '../../lib/loan-benchmarks';
 import { LENDER_DB } from '../../data/lenders';
 import type { EmploymentType, LoanProductType } from '../../data/lenders';
@@ -49,15 +50,16 @@ import type { EmploymentType, LoanProductType } from '../../data/lenders';
 const LOAN_MATH_ENDPOINT = '/api/hooks/execute/workspace-253940/loan-math';
 
 /**
- * The neutral personal-loan source dataset behind the ranking: the
- * 'personal-loans-download' hook serves data/personal_loans.json (20 lenders'
- * published rates, fees and eligibility) with the weekly refresh's live rate
- * overrides already layered in.
+ * The neutral personal-loan source dataset behind the ranking:
+ * data/personal_loans.json — 20 lenders' published rates, fees and eligibility,
+ * every value read off that lender's own official page. The ranking is
+ * computed from these records (lib/personal-loan-source.ts) and the download
+ * below hands over the same array, so the file a borrower audits is the file
+ * the answer came from.
  */
-const PL_DATA_ENDPOINT = '/api/hooks/execute/workspace-253940/personal-loans-download';
 
 /** Filename the browser saves the source dataset under. */
-const PL_DATA_FILENAME = 'loanley-pl-data.json';
+const PL_DATA_FILENAME = 'personal_loans.json';
 
 const TRUST_HEADER =
   'No lender has paid for placement. Ranked by effective cost for your profile. Rates sourced from official lender rate cards.';
@@ -577,7 +579,7 @@ function SourceCitation({ row, tone = 'light' }: { row: ComparisonRow; tone?: 'l
       }`}
       data-testid={`source-${row.lenderId}`}
     >
-      Source: {shortLenderName(row.lenderName)} official rate card
+      Source: {shortLenderName(row.lenderName)} official page ↗
     </a>
   );
 }
@@ -1062,23 +1064,19 @@ const NAV_BUTTON_CLASS =
  * published dataset away and audit the ranking, which is the opposite of the
  * pitch every other Indian loan site makes.
  *
- * The hook sandbox can only set Content-Type on a raw response, so the
- * attachment filename cannot arrive as Content-Disposition. It is applied here
- * through the anchor's download attribute instead, which is what actually names
- * the file in the browser's save dialog.
+ * The file is built from the very records the ranking above was computed from,
+ * so what a borrower saves cannot drift from what they were shown. The
+ * attachment filename is applied through the anchor's download attribute,
+ * which is what actually names the file in the browser's save dialog.
  * ==========================================================================*/
 
 function SourceDataDownload() {
   const [status, setStatus] = useState<'idle' | 'busy' | 'error'>('idle');
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setStatus('busy');
     try {
-      const res = await fetch(PL_DATA_ENDPOINT, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`source data unavailable (HTTP ${res.status})`);
-      const text = await res.text();
-
-      const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+      const url = URL.createObjectURL(new Blob([personalLoansJson()], { type: 'application/json' }));
       const link = document.createElement('a');
       link.href = url;
       link.download = PL_DATA_FILENAME;
@@ -1113,7 +1111,7 @@ function SourceDataDownload() {
       <p className="mt-0.5 text-[10px] leading-snug text-[var(--space-text-muted)]">
         {status === 'error'
           ? "That download didn't go through. Please try again in a moment — every figure is also cited inline above."
-          : '20 lenders, updated weekly from published rate cards.'}
+          : `${PERSONAL_LOANS.length} lenders — every figure read off the lender's own official page.`}
       </p>
     </div>
   );

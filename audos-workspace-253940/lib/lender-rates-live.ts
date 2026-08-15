@@ -8,6 +8,12 @@
  * data/lenders.ts bundle, so a weekly refresh reaches borrowers on their next
  * page load with no republish.
  *
+ * The personal-loan half of that bundle is itself replaced first, by
+ * data/personal_loans.json (via lib/personal-loan-source.ts) — the scraped
+ * dataset of 20 lenders' published terms that borrowers can download and check
+ * the ranking against. A weekly override refreshes a value inside that
+ * dataset; it never stands in for it.
+ *
  * Every customer surface must get its lenders from here (`useLiveLenderDb()`)
  * and hand the result to `compareLenders(req, data)` — never read
  * `lender_rate_overrides` directly, or the validation below is bypassed and the
@@ -30,6 +36,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LENDER_DB } from '../data/lenders';
 import type { Lender, LenderProduct, LoanProductType } from '../data/lenders';
+import { applyPersonalLoanSource } from './personal-loan-source';
 
 /** WorkspaceDB table the weekly refresh writes. */
 export const RATE_OVERRIDE_TABLE = 'lender_rate_overrides';
@@ -195,9 +202,10 @@ function mergeProduct(base: LenderProduct, row: RateOverrideRow): ProductMerge {
  * lenders and products the bundle doesn't carry.
  */
 export function mergeRateOverrides(rows: RateOverrideRow[] | null | undefined): LiveLenderData {
+  const source = applyPersonalLoanSource(LENDER_DB);
   const bundled: LiveLenderData = {
-    lenders: LENDER_DB.lenders,
-    lastUpdated: LENDER_DB.lastUpdated,
+    lenders: source.lenders,
+    lastUpdated: source.lastUpdated,
     overriddenFields: 0,
   };
   if (!Array.isArray(rows) || rows.length === 0) return bundled;
@@ -214,9 +222,9 @@ export function mergeRateOverrides(rows: RateOverrideRow[] | null | undefined): 
 
   let overriddenFields = 0;
   let touchedLenders = 0;
-  let lastUpdated = LENDER_DB.lastUpdated;
+  let lastUpdated = source.lastUpdated;
 
-  const lenders = LENDER_DB.lenders.map((lender) => {
+  const lenders = source.lenders.map((lender) => {
     const products = { ...lender.products };
     let lenderFields = 0;
     let lenderTouched = false;
