@@ -26,7 +26,8 @@
  * hook. Nothing is estimated.
  */
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, Download, Info, Loader2, RotateCcw, Send, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Download, Info, Loader2, RotateCcw, Send, ShieldCheck, UploadCloud } from 'lucide-react';
+import LoanDocumentCheck from '../../components/LoanDocumentCheck';
 import {
   LoanleyResultCard,
   RupeeAmount,
@@ -1061,9 +1062,10 @@ function extractOffer(raw: string): Partial<OfferDraft> {
  * ==========================================================================*/
 
 const WELCOME =
-  "Namaste — I'm Loan Check by Loanley.\n\nTell me what you need in plain language (English or Hinglish) and I'll tell you honestly which lenders will actually consider you, and which one costs the least once fees are counted. No lender pays us a rupee, and nothing you type is sent to any lender.";
+  "Namaste — I'm Loan Check by Loanley.\n\nTell me what you need in plain language (English or Hinglish) and I'll tell you honestly which lenders will actually consider you, and which one costs the least once fees are counted. No lender pays us a rupee, and nothing you type is sent to any lender.\n\nAlready holding an offer letter, sanction letter or loan agreement? Upload it and I'll read the amount, rate, tenure and processing fee straight off the page — you just check the figures and hit Calculate.";
 
 const WELCOME_REPLIES: QuickReply[] = [
+  { label: 'Upload my loan document', value: 'upload my loan document' },
   { label: 'I want a personal loan', value: 'I want a personal loan' },
   { label: 'Best loan for me', value: 'best loan for me' },
   { label: 'Loan chahiye', value: 'loan chahiye' },
@@ -1080,7 +1082,7 @@ const AFTER_RESULT_REPLIES: QuickReply[] = [
  * 10. About — the founder's origin story, verbatim.
  * ==========================================================================*/
 
-type Route = 'chat' | 'about';
+type Route = 'chat' | 'about' | 'offer';
 
 const ABOUT_HEADLINE = 'Why I Built This';
 
@@ -1102,8 +1104,9 @@ const ABOUT_TRUST_LINE =
 function readRouteFromUrl(): Route {
   try {
     if (/\/about\/?$/i.test(window.location.pathname)) return 'about';
-    const view = new URLSearchParams(window.location.search).get('view');
-    if ((view || '').toLowerCase() === 'about') return 'about';
+    const view = (new URLSearchParams(window.location.search).get('view') || '').toLowerCase();
+    if (view === 'about') return 'about';
+    if (view === 'offer') return 'offer';
   } catch {
     // Location unreadable (sandboxed preview) — the chat is the safe default.
   }
@@ -1113,8 +1116,8 @@ function readRouteFromUrl(): Route {
 function urlForRoute(route: Route): string | null {
   try {
     const url = new URL(window.location.href);
-    if (route === 'about') url.searchParams.set('view', 'about');
-    else url.searchParams.delete('view');
+    if (route === 'chat') url.searchParams.delete('view');
+    else url.searchParams.set('view', route);
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return null;
@@ -1342,6 +1345,7 @@ export default function LoanCheck() {
           bot('Want me to check which lenders would actually approve you, and whether any of them beats this?', [
             { label: 'Yes — find my best loan', value: 'find the best loan for me' },
             { label: 'Check another offer', value: 'check another offer' },
+            { label: 'Upload a document', value: 'upload my loan document' },
           ]),
         );
       } else if (Array.isArray(data?.validation_errors) && data.validation_errors.length > 0) {
@@ -1406,6 +1410,24 @@ export default function LoanCheck() {
       setPendingOfferField(null);
       out.push(bot("No problem — let's redo the six details from the top."));
       startCriteria({}, out, false);
+      return;
+    }
+    // Paperwork in hand beats twenty questions: the document check reads the
+    // figures off the page and pre-fills the same calculator.
+    if (
+      !pendingField &&
+      !pendingOfferField &&
+      (/\b(upload|scan|scanned|attach)\b/.test(t) ||
+        /\b(sanction letter|offer letter|loan agreement|loan papers|paperwork)\b/.test(t) ||
+        /\bpdf\b/.test(t))
+    ) {
+      out.push(
+        bot(
+          "Opening the document check — drop the PDF or a photo of the letter in and I'll read the loan amount, interest rate, tenure and processing fee off it. Whatever I find lands in the form highlighted so you can check it against the page, and anything the document doesn't state clearly stays blank for you to fill in.",
+        ),
+      );
+      push(...out);
+      navigate('offer');
       return;
     }
     if (/check (another|an|my) offer|i have an offer|got an offer/.test(t) && !pendingField) {
@@ -1586,7 +1608,7 @@ export default function LoanCheck() {
           </p>
         </div>
         <nav className="ml-auto flex shrink-0 items-center gap-1.5">
-          {route === 'about' ? (
+          {route !== 'chat' ? (
             <button
               type="button"
               onClick={() => navigate('chat')}
@@ -1597,6 +1619,14 @@ export default function LoanCheck() {
             </button>
           ) : (
             <>
+              <button
+                type="button"
+                onClick={() => navigate('offer')}
+                className={NAV_BUTTON_CLASS}
+                data-testid="nav-upload-document"
+              >
+                <UploadCloud className="h-3 w-3" /> Upload document
+              </button>
               <button
                 type="button"
                 onClick={() => navigate('about')}
@@ -1620,6 +1650,8 @@ export default function LoanCheck() {
 
       {route === 'about' ? (
         <AboutPage />
+      ) : route === 'offer' ? (
+        <LoanDocumentCheck />
       ) : (
         <>
       {/* thread */}
