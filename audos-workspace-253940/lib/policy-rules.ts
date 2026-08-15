@@ -33,6 +33,18 @@ import type { Lender, LenderDatabase, LenderProduct } from '../data/lenders';
 export { POLICY_RULES, POLICY_RULES_AWAITING_RATE_CARD, POLICY_RULE_SHEET, policyRuleFor };
 export type { PolicyRuleRecord };
 
+/**
+ * LenderProduct plus the provenance marker this layer writes.
+ *
+ * Declared here rather than leaned on from data/lenders.ts because that file is
+ * a generated mirror: `scripts/scrape-lenders.js --sync` rewrites it from the
+ * interface template inside that script, so a field declared only in the mirror
+ * can vanish on the next refresh and take the compile with it. The copy in
+ * data/lenders.ts documents the field for anyone reading the database; this one
+ * is what the code type-checks against.
+ */
+type DeskPolicyProduct = LenderProduct & { criteriaFromDeskPolicy?: string[] };
+
 /** How a desk-policy criterion must be described wherever a borrower sees it. */
 export const DESK_POLICY_LABEL = "Loanley's desk credit-policy record";
 
@@ -46,7 +58,7 @@ export const DESK_POLICY_CAVEAT =
  * comparison engine can attribute it.
  */
 function mergeProduct(base: LenderProduct, record: PolicyRuleRecord): LenderProduct {
-  const merged: LenderProduct = { ...base };
+  const merged: DeskPolicyProduct = { ...base };
   const fromDesk: string[] = [];
 
   if (record.employmentTypes && record.employmentTypes.length > 0) {
@@ -112,7 +124,7 @@ export function applyPolicyRules(db: LenderDatabase): LenderDatabase {
 
 /** Which criteria on a product came from the desk sheet rather than a rate card. */
 export function isDeskPolicyCriterion(product: LenderProduct, field: string): boolean {
-  return product.criteriaFromDeskPolicy?.includes(field) ?? false;
+  return (product as DeskPolicyProduct).criteriaFromDeskPolicy?.includes(field) ?? false;
 }
 
 /* ============================================================================
