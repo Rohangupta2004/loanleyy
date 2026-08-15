@@ -12,6 +12,10 @@
  *   • Every row links only to the lender's official rate card for verification.
  *   • Lenders where the borrower likely does NOT qualify are shown too,
  *     clearly labelled with the reason — nothing is silently hidden.
+ *   • Personal-loan approval criteria come from Loanley's desk credit-policy
+ *     record (lib/policy-rules.ts), because lenders publish rate cards rather
+ *     than approval rules. Those are labelled as desk policy on the row and in
+ *     the reason, never shown as figures the lender published.
  */
 import { useMemo, useRef, useState } from 'react';
 import { Scale, Info, CheckCircle2 } from 'lucide-react';
@@ -24,6 +28,7 @@ import {
 } from '../lib/lender-compare';
 import type { BorrowerRequirements, ComparisonResult, ComparisonRow, CreditBand } from '../lib/lender-compare';
 import { useLiveLenderDb } from '../lib/lender-rates-live';
+import { DESK_POLICY_CAVEAT, policyRuleFor, policyRuleLines } from '../lib/policy-rules';
 import type { EmploymentType, LoanProductType } from '../data/lenders';
 
 const LOAN_TYPE_OPTIONS: { value: LoanProductType; label: string }[] = [
@@ -86,7 +91,44 @@ function buildAgentSummary(result: ComparisonResult): string {
   ].join('\n');
 }
 
-function RowCard({ row, rank }: { row: ComparisonRow; rank?: number }) {
+/**
+ * The lender's approval rules from Loanley's desk credit-policy record. Behind a
+ * disclosure, and labelled, because the row's source link goes to the lender's
+ * rate card — which does not carry these rules. Personal loans only: the sheet
+ * records personal-loan policy and must not be shown against another product.
+ */
+function PolicyRulesDisclosure({ lenderId, loanType }: { lenderId: string; loanType: LoanProductType }) {
+  if (loanType !== 'personal') return null;
+  const record = policyRuleFor(lenderId);
+  if (!record) return null;
+  const lines = policyRuleLines(record);
+  if (lines.length === 0) return null;
+
+  return (
+    <details
+      className="mt-1.5 rounded-lg border border-[var(--space-border-default)] bg-[var(--space-surface-muted)] px-2.5 py-1.5"
+      data-testid={`compare-policy-rules-${lenderId}`}
+    >
+      <summary className="cursor-pointer text-[11px] font-semibold text-[var(--space-text-brand)]">
+        Approval rules — what {shortLenderName(record.lender)} actually asks for
+      </summary>
+      <dl className="mt-1.5 grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
+        {lines.map((line) => (
+          <div key={line.label}>
+            <dt className="text-[10px] text-[var(--space-text-muted)]">{line.label}</dt>
+            <dd className="text-[11px] font-medium leading-snug text-[var(--space-text-primary)]">{line.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {record.remark && (
+        <p className="mt-1.5 text-[10px] leading-snug text-[var(--space-text-secondary)]">Also on file: {record.remark}</p>
+      )}
+      <p className="mt-1.5 text-[10px] leading-snug text-[var(--space-text-muted)]">{DESK_POLICY_CAVEAT}</p>
+    </details>
+  );
+}
+
+function RowCard({ row, rank, loanType }: { row: ComparisonRow; rank?: number; loanType: LoanProductType }) {
   const likelyOut = row.reasons.length > 0;
   return (
     <div
@@ -170,6 +212,8 @@ function RowCard({ row, rank }: { row: ComparisonRow; rank?: number }) {
           {row.dataNote && (
             <p className="mt-1 text-[10px] leading-snug text-[var(--space-text-muted)]">{row.dataNote}</p>
           )}
+
+          <PolicyRulesDisclosure lenderId={row.lenderId} loanType={loanType} />
 
           {likelyOut && (
             <p className="mt-1.5 text-[11px]">
@@ -458,7 +502,7 @@ export function LoanleyCompareCard({ raw, onSubmit }: LoanleyCompareCardProps) {
                 </p>
               )}
               {result.eligible.slice(1).map((row, i) => (
-                <RowCard key={row.lenderId} row={row} rank={i + 2} />
+                <RowCard key={row.lenderId} row={row} rank={i + 2} loanType={result.requirements.loanType} />
               ))}
             </div>
           ) : (
@@ -475,11 +519,12 @@ export function LoanleyCompareCard({ raw, onSubmit }: LoanleyCompareCardProps) {
                 Likely out of reach for your profile
               </p>
               <p className="mb-2 mt-0.5 text-[10px] leading-snug text-[var(--space-text-muted)]">
-                Based on each lender's own published criteria — shown anyway, so nothing is hidden.
+                Based on each lender's own criteria — shown anyway, so nothing is hidden. Each reason says whether it
+                came from the lender's published page or from Loanley's desk record of its credit policy.
               </p>
               <div className="space-y-2 opacity-70">
                 {result.outOfRange.map((row) => (
-                  <RowCard key={row.lenderId} row={row} />
+                  <RowCard key={row.lenderId} row={row} loanType={result.requirements.loanType} />
                 ))}
               </div>
             </div>

@@ -1,5 +1,5 @@
 <!-- __compiler_v:5 -->
-<!-- AUDOS_PUBLISH_TOKEN:fcb5d2d1-85b6-4194-8e07-8806953fd024 -->
+<!-- AUDOS_PUBLISH_TOKEN:0fdde583-e612-4cef-bb91-33091608d37b -->
 <!DOCTYPE html>
 <html lang="en" class="light">
   <head>
@@ -1503,6 +1503,9 @@ video {
 .border-white\/15 {
   border-color: rgb(255 255 255 / 0.15);
 }
+.border-white\/20 {
+  border-color: rgb(255 255 255 / 0.2);
+}
 .border-white\/70 {
   border-color: rgb(255 255 255 / 0.7);
 }
@@ -1606,6 +1609,9 @@ video {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+.bg-white\/10 {
+  background-color: rgb(255 255 255 / 0.1);
 }
 .bg-white\/90 {
   background-color: rgb(255 255 255 / 0.9);
@@ -4179,10 +4185,10 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/loan-benchmarks.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/loan-benchmarks.ts
 var RBI_BENCHMARK_RANGES, RBI_MASTER_DIRECTIONS_URL;
 var init_loan_benchmarks = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/lib/loan-benchmarks.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/lib/loan-benchmarks.ts"() {
     RBI_BENCHMARK_RANGES = {
       personal: { minPct: 10, maxPct: 24 },
       home: { minPct: 8, maxPct: 12 },
@@ -4194,7 +4200,7 @@ var init_loan_benchmarks = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/LoanleyCards.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/LoanleyCards.tsx
 import { useState as useState2 } from "react";
 import {
   Calculator,
@@ -4598,7 +4604,7 @@ function LoanleyResultCard({ raw }) {
 }
 var LOAN_TYPES, LENDER_SHORT_NAMES;
 var init_LoanleyCards = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/components/LoanleyCards.tsx"() {
+  "../../../tmp/space-workspace-253940-atqovT/components/LoanleyCards.tsx"() {
     init_loan_benchmarks();
     LOAN_TYPES = [
       { value: "personal", label: "Personal Loan" },
@@ -4620,10 +4626,10 @@ var init_LoanleyCards = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/data/lenders.ts
+// ../../../tmp/space-workspace-253940-atqovT/data/lenders.ts
 var LENDER_DB;
 var init_lenders = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/data/lenders.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/data/lenders.ts"() {
     LENDER_DB = {
       name: "Loanley India lender database",
       description: "Published interest rates, fees and eligibility criteria for major Indian banks and NBFCs. Sourced from each lender's official rate card and RBI disclosures. This file is the single source of truth \u2014 scripts/scrape-lenders.js refreshes it weekly and regenerates data/lenders.ts for the app bundle.",
@@ -5916,22 +5922,171 @@ var init_lenders = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/lender-compare.ts
-function describeMonths(months) {
-  if (months >= 12 && months % 12 === 0) {
-    const years = months / 12;
-    return `${years} year${years === 1 ? "" : "s"}`;
+// ../../../tmp/space-workspace-253940-atqovT/data/policy-rules-data.ts
+function policyRuleFor(lenderId) {
+  return BY_LENDER_ID.get(lenderId);
+}
+var POLICY_RULES, POLICY_RULES_AWAITING_RATE_CARD, BY_LENDER_ID;
+var init_policy_rules_data = __esm({
+  "../../../tmp/space-workspace-253940-atqovT/data/policy-rules-data.ts"() {
+    POLICY_RULES = [
+      { "lender": "HDFC Bank", "sheetLabel": "HDFC Bank", "lenderId": "hdfc-bank", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 22, "ageMax": 61, "loanAmountMin": 5e4, "minSalaryMonthly": 25e3, "minSalaryRule": "Cat A : 25000 ; CAT B: 30000 ; CAT C 35000 , CAT D&E: 50000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "YES (Permanent address verification required)", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": true, "nonListedCompanyAccepted": false, "companyMcaVintage": "NA", "companyMcaVintageYears": null, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": true, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 72, "balanceTransferMaxLoans": 4, "balanceTransferRule": "Up to 4 loans", "remark": "Official email-id mandatary" },
+      { "lender": "ICICI Bank", "sheetLabel": "ICICI Bank", "lenderId": "icici", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": true, "employmentTypes": ["salaried", "self_employed"], "ageMin": 22, "ageMax": 61, "loanAmountMin": 1e5, "minSalaryMonthly": 3e4, "minSalaryRule": "For All Listed : 30000 ; Open Market : 40000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "YES", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 2, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 72, "balanceTransferMaxLoans": 5, "balanceTransferRule": "Up to 5 loans", "remark": "FOIR 5 % additonal for owned house" },
+      { "lender": "Axis Bank", "sheetLabel": "Axis bank", "lenderId": "axis", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 25e3, "minSalaryRule": "SUPER CAT A & Cat A : 25000 ; CAT  B and CAT C : 35000 ; CAT D : 60000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": true, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 3, "balanceTransferRule": "Up to 3 loans", "remark": "For Nth >40k, FOIR 80%. LIC agents and Doctors can also avail PL upto 40 lacs" },
+      { "lender": "Yes Bank", "sheetLabel": "YES Bank", "lenderId": "yes-bank", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 5e4, "minSalaryMonthly": 28e3, "minSalaryRule": "28000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "Bachelor : Yes Yes ( CIBIL 725 & Sal > 35K); Hostel accomodation :NO", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "5", "companyMcaVintageYears": 5, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 0.5, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 5, "balanceTransferRule": "Up to 5 loans", "remark": "Doctor profiles based on certificate can do, CIBIL -1 and less than 700 FOIR is 50%, rental income can be considered" },
+      { "lender": "IDFC FIRST Bank", "sheetLabel": "IDFC First Bank", "lenderId": "idfc-first", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": true, "employmentTypes": ["salaried", "self_employed"], "ageMin": 23, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 2e4, "minSalaryRule": "20000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "YES", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "3", "companyMcaVintageYears": 3, "presentEmploymentMinMonths": 3, "totalEmploymentMinYears": 2, "form16Mandatory": false, "cibilMinusOneAccepted": false, "cibilMinusOneRule": "NO", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 3, "balanceTransferRule": "Up to 3 loans", "remark": "Lock-in 1 year" },
+      { "lender": "Kotak Mahindra Bank", "sheetLabel": "Kotak", "lenderId": "kotak", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 3e4, "minSalaryRule": "30000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "Bachelor : YES Hostel NO", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": true, "nonListedCompanyAccepted": false, "companyMcaVintage": "NA", "companyMcaVintageYears": null, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 3, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (Max 5 lacs)", "cibilMinusOneMaxAmount": 5e5, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 4, "balanceTransferRule": "Up to 4 loans", "remark": "Lock-in 1 year, 70% of rental income considered if credited, 50% of Yearly Bonus ; HL EMI will not be obligated if it is in spouse name, provided spouse income documents are provided." },
+      { "lender": "IndusInd Bank", "sheetLabel": "IndusInd Bank", "lenderId": "indusind", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 58, "loanAmountMin": 1e5, "minSalaryMonthly": 25e3, "minSalaryRule": "Listed:25K;OpenMarket:30K", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 2, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 72, "balanceTransferMaxLoans": 5, "balanceTransferRule": "Up to 5 loans", "remark": "FOIR 5 % additonal for owned house, address proof not required for online process" },
+      { "lender": "Bandhan Bank", "sheetLabel": "Bankdhan Bank", "lenderId": "bandhan-bank", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 25e3, "minSalaryRule": "Govt, CAT A & CAT B (25K) : CAT C 30K: CAT D 40K", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "Bachelor : YES (OHP required) ; Hostel NO", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "5", "companyMcaVintageYears": 5, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (For CAT A up to 5 lakh; Remaining 3 lakh)", "cibilMinusOneMaxAmount": 3e5, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 0, "balanceTransferRule": "Not allowed", "remark": "Rental considered. CIBIL -1 max 5 Lacs" },
+      { "lender": "Aditya Birla Finance", "sheetLabel": "Aditya Birla", "lenderId": "aditya-birla-finance", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 23, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 2e4, "minSalaryRule": "20000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "Bachelor : YES for CAT A and CAT B ; Hostel NO", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "3", "companyMcaVintageYears": 3, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 3, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (Max 5 lacs)", "cibilMinusOneMaxAmount": 5e5, "tenureMinMonths": 24, "tenureMaxMonths": 84, "balanceTransferMaxLoans": 7, "balanceTransferRule": "Up to 7 loans", "remark": "Employees of Proprietorship , Partnerships & LLP companies can also apply  ; Banking Surrogate : Loan upto 5 lacs can be provided just based on Bank statements with ABB 1.10 ; RTR Product for PL also available ; ABB not required for salary upto 35k if PL HIT SCORE > = 589." },
+      { "lender": "Axis Finance", "sheetLabel": "Axis Finance", "lenderId": "axis-finance", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 25, "ageMax": 60, "loanAmountMin": 2e5, "minSalaryMonthly": 3e4, "minSalaryRule": "30000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "Bachelor : YES for CAT A and CAT B ; Hostel NO", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "3", "companyMcaVintageYears": 3, "presentEmploymentMinMonths": 12, "totalEmploymentMinYears": 3, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (Max 5 lacs)", "cibilMinusOneMaxAmount": 5e5, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 8, "balanceTransferRule": "Up to 8 loans", "remark": "Other sources of income such as Rental Income, Bonus or any other income reflecting considered, All types of BTs allowed such as (CC, PL, Drop line, CD, Jumbo loans, Insta loans, APP loans , AL & GL)" },
+      { "lender": "Tata Capital", "sheetLabel": "TATA CAPITAL", "lenderId": "tata-capital", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 22, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 2e4, "minSalaryRule": "Super A ,CAT A :20K ;; CAT B & Govt : 25K", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "YES (OHV)", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": true, "nonListedCompanyAccepted": false, "companyMcaVintage": "NA", "companyMcaVintageYears": null, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (Max 3 lacs)", "cibilMinusOneMaxAmount": 3e5, "tenureMinMonths": 24, "tenureMaxMonths": 72, "balanceTransferMaxLoans": 5, "balanceTransferRule": "Up to 5 loans", "remark": "PL-OD is allowed, can Do applicant & Co-applicant." },
+      { "lender": "InCred Finance", "sheetLabel": "INCRED", "lenderId": "incred", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": true, "employmentTypes": ["salaried", "self_employed"], "ageMin": 21, "ageMax": 56, "loanAmountMin": 5e4, "minSalaryMonthly": 15e3, "minSalaryRule": "15000", "salaryCreditMode": "NEFT", "salarySlipsRequired": false, "accommodationRule": "YES", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 3, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 24, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 3, "balanceTransferRule": "Up to 3 loans", "remark": "Allowed for Zero deduction Employees ; Allowed funding for Proprietor ship, Partnership, LLP, Pvt Ltd, Public Ltd & Govt (class 4) Employees" },
+      { "lender": "Finnable", "sheetLabel": "Finnable", "lenderId": "finnable", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 58, "loanAmountMin": 5e4, "minSalaryMonthly": 2e4, "minSalaryRule": "20000", "salaryCreditMode": "NEFT", "salarySlipsRequired": false, "accommodationRule": "YES", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "0", "companyMcaVintageYears": 0, "presentEmploymentMinMonths": 3, "totalEmploymentMinYears": 2, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 36, "tenureMaxMonths": 60, "balanceTransferMaxLoans": null, "balanceTransferRule": "No published limit", "remark": "PF and PT is not mandate, Address proof not required." },
+      { "lender": "Piramal Finance", "sheetLabel": "Piramal", "lenderId": "piramal-finance", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 28e3, "minSalaryRule": "28000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 6, "totalEmploymentMinYears": 3, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 0, "balanceTransferRule": "Not allowed", "remark": "Employees of partnership & proprietorship allowed for max 5 lacs with OHP" },
+      { "lender": "SMFG India Credit", "sheetLabel": "SMFG", "lenderId": "smfg-india-credit", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 2e4, "minSalaryRule": "20000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 2, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES (Max 5 lacs)", "cibilMinusOneMaxAmount": 5e5, "tenureMinMonths": 24, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 7, "balanceTransferRule": "Up to 7 loans", "remark": "Lock-in 9 months ; will do propriator and partnership, LLP profiles, sal req 25k; max loan amount 7.5L ; MCA registration 1 month companies also will do." },
+      { "lender": "Bajaj Finserv (Bajaj Finance)", "sheetLabel": "Bajaj", "lenderId": "bajaj-finserv", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 23, "ageMax": 55, "loanAmountMin": 1e5, "minSalaryMonthly": 36e3, "minSalaryRule": "36000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "2", "companyMcaVintageYears": 2, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 3, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES for Listed Companies", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 36, "tenureMaxMonths": 72, "balanceTransferMaxLoans": 4, "balanceTransferRule": "Up to 4 loans", "remark": null },
+      { "lender": "Cholamandalam Investment & Finance", "sheetLabel": "Chola", "lenderId": "cholamandalam", "inLenderDatabase": false, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": true, "employmentTypes": ["salaried", "self_employed"], "ageMin": 24, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 25e3, "minSalaryRule": "25000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": false, "nonListedCompanyAccepted": true, "companyMcaVintage": "1", "companyMcaVintageYears": 1, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": false, "cibilMinusOneRule": "NO", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 24, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 0, "balanceTransferRule": "Not allowed", "remark": null },
+      { "lender": "Poonawalla Fincorp", "sheetLabel": "Poonawala", "lenderId": "poonawalla-fincorp", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 24, "ageMax": 58, "loanAmountMin": 1e5, "minSalaryMonthly": 3e4, "minSalaryRule": "30000", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "YES", "bachelorAccommodationAllowed": true, "hostelAccommodationAllowed": null, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": true, "nonListedCompanyAccepted": false, "companyMcaVintage": "NA", "companyMcaVintageYears": null, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": false, "cibilMinusOneRule": "NO", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 60, "balanceTransferMaxLoans": 3, "balanceTransferRule": "Up to 3 loans", "remark": "Official email-id mandatary" },
+      { "lender": "L&T Finance", "sheetLabel": "L&T", "lenderId": "lt-finance", "inLenderDatabase": true, "salariedPersonalLoan": true, "selfEmployedPersonalLoan": false, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "loanAmountMin": 1e5, "minSalaryMonthly": 25e3, "minSalaryRule": "35000 for Age > 30 ; 25000 for Age < 30", "salaryCreditMode": "NEFT", "salarySlipsRequired": true, "accommodationRule": "NO", "bachelorAccommodationAllowed": false, "hostelAccommodationAllowed": false, "listedCompanyAccepted": true, "onlyListedCompanyAccepted": true, "nonListedCompanyAccepted": false, "companyMcaVintage": "NA", "companyMcaVintageYears": null, "presentEmploymentMinMonths": 1, "totalEmploymentMinYears": 1, "form16Mandatory": false, "cibilMinusOneAccepted": true, "cibilMinusOneRule": "YES", "cibilMinusOneMaxAmount": null, "tenureMinMonths": 12, "tenureMaxMonths": 72, "balanceTransferMaxLoans": null, "balanceTransferRule": "No published limit", "remark": "Rental considered" }
+    ];
+    POLICY_RULES_AWAITING_RATE_CARD = POLICY_RULES.filter(
+      (record) => !record.inLenderDatabase
+    );
+    BY_LENDER_ID = new Map(
+      POLICY_RULES.map((record) => [record.lenderId, record])
+    );
   }
-  return `${months} months`;
+});
+
+// ../../../tmp/space-workspace-253940-atqovT/lib/policy-rules.ts
+function mergeProduct(base, record) {
+  const merged = { ...base };
+  const fromDesk = [];
+  if (record.employmentTypes && record.employmentTypes.length > 0) {
+    const desk = [...record.employmentTypes].sort().join("+");
+    if (desk !== [...base.employmentTypes].sort().join("+")) {
+      merged.employmentTypes = [...record.employmentTypes];
+      fromDesk.push("employmentTypes");
+    }
+  }
+  if (record.loanAmountMin != null && record.loanAmountMin !== base.minLoanAmount && record.loanAmountMin <= base.maxLoanAmount) {
+    merged.minLoanAmount = record.loanAmountMin;
+    fromDesk.push("minLoanAmount");
+  }
+  const tenureMin = record.tenureMinMonths ?? base.minTenureMonths;
+  const tenureMax = record.tenureMaxMonths ?? base.maxTenureMonths;
+  if (tenureMin <= tenureMax) {
+    if (record.tenureMinMonths != null && record.tenureMinMonths !== base.minTenureMonths) {
+      merged.minTenureMonths = record.tenureMinMonths;
+      fromDesk.push("minTenureMonths");
+    }
+    if (record.tenureMaxMonths != null && record.tenureMaxMonths !== base.maxTenureMonths) {
+      merged.maxTenureMonths = record.tenureMaxMonths;
+      fromDesk.push("maxTenureMonths");
+    }
+  }
+  if (record.minSalaryMonthly != null && record.minSalaryMonthly !== base.minSalary) {
+    merged.minSalary = record.minSalaryMonthly;
+    fromDesk.push("minSalary");
+  }
+  if (fromDesk.length === 0) return base;
+  merged.criteriaFromDeskPolicy = fromDesk;
+  return merged;
+}
+function applyPolicyRules(db) {
+  const lenders = db.lenders.map((lender) => {
+    const record = policyRuleFor(lender.id);
+    const base = lender.products.personal;
+    if (!record || !base) return lender;
+    const personal = mergeProduct(base, record);
+    if (personal === base) return lender;
+    return { ...lender, products: { ...lender.products, personal } };
+  });
+  return { ...db, lenders };
+}
+function isDeskPolicyCriterion(product, field) {
+  return product.criteriaFromDeskPolicy?.includes(field) ?? false;
+}
+function rupees(value) {
+  return `\u20B9${Math.round(value).toLocaleString("en-IN")}`;
+}
+function yesNo(value, yes = "Yes", no = "No") {
+  if (value == null) return null;
+  return value ? yes : no;
+}
+function years(value) {
+  if (value == null) return null;
+  if (value === 1) return "1 year";
+  return `${value} years`;
+}
+function months(value) {
+  if (value == null) return null;
+  return value === 1 ? "1 month" : `${value} months`;
+}
+function companyRule(record) {
+  if (record.onlyListedCompanyAccepted === true) return "Listed companies only";
+  if (record.nonListedCompanyAccepted === true) return "Listed and non-listed companies";
+  if (record.listedCompanyAccepted === true) return "Listed companies";
+  return null;
+}
+function noHistoryRule(record) {
+  if (record.cibilMinusOneAccepted == null) return null;
+  if (!record.cibilMinusOneAccepted) return "Not considered";
+  if (record.cibilMinusOneMaxAmount != null) {
+    return `Considered, up to ${rupees(record.cibilMinusOneMaxAmount)}`;
+  }
+  return `Considered \u2014 ${record.cibilMinusOneRule}`;
+}
+function policyRuleLines(record) {
+  const candidates = [
+    ["Age", record.ageMin != null && record.ageMax != null ? `${record.ageMin}\u2013${record.ageMax} years` : null],
+    ["Minimum loan", record.loanAmountMin != null ? rupees(record.loanAmountMin) : null],
+    ["Minimum salary", record.minSalaryRule || null],
+    ["Salary must be credited by", record.salaryCreditMode],
+    ["Salary slips", yesNo(record.salarySlipsRequired, "Required", "Not required")],
+    [
+      "Tenure",
+      record.tenureMinMonths != null && record.tenureMaxMonths != null ? `${record.tenureMinMonths}\u2013${record.tenureMaxMonths} months` : null
+    ],
+    ["Time in current job", months(record.presentEmploymentMinMonths)],
+    ["Total work experience", years(record.totalEmploymentMinYears)],
+    ["Employer", companyRule(record)],
+    ["Employer registered (MCA)", record.companyMcaVintageYears != null ? years(record.companyMcaVintageYears) : null],
+    ["Form 16", yesNo(record.form16Mandatory, "Mandatory", "Not mandatory")],
+    ["No credit history (CIBIL -1)", noHistoryRule(record)],
+    ["Balance transfers", record.balanceTransferRule || null],
+    ["Rented / bachelor accommodation", record.accommodationRule || null]
+  ];
+  return candidates.filter((entry) => entry[1] != null && entry[1] !== "").map(([label, value]) => ({ label, value }));
+}
+var DESK_POLICY_CAVEAT;
+var init_policy_rules = __esm({
+  "../../../tmp/space-workspace-253940-atqovT/lib/policy-rules.ts"() {
+    init_policy_rules_data();
+    DESK_POLICY_CAVEAT = "These approval rules come from Loanley's own desk record of each lender's credit policy, not from the lender's website \u2014 lenders publish rate cards, not their approval rules. Rates, fees and costs on this screen are still the lender's own published figures.";
+  }
+});
+
+// ../../../tmp/space-workspace-253940-atqovT/lib/lender-compare.ts
+function describeMonths(months2) {
+  if (months2 >= 12 && months2 % 12 === 0) {
+    const years2 = months2 / 12;
+    return `${years2} year${years2 === 1 ? "" : "s"}`;
+  }
+  return `${months2} months`;
 }
 function joinWithAnd(parts) {
   if (parts.length <= 1) return parts[0] ?? "";
   return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
 }
-function computeEmi(principal, annualRatePct, months) {
+function criterionSource(product, field) {
+  return isDeskPolicyCriterion(product, field) ? "Loanley's desk policy record" : "the lender's published criteria";
+}
+function computeEmi(principal, annualRatePct, months2) {
   const r = annualRatePct / 12 / 100;
-  if (r <= 0) return principal / months;
-  const pow = Math.pow(1 + r, months);
+  if (r <= 0) return principal / months2;
+  const pow = Math.pow(1 + r, months2);
   return principal * r * pow / (pow - 1);
 }
 function computeFee(product, amount) {
@@ -5950,12 +6105,12 @@ function computeFee(product, amount) {
   }
   return { amount: Math.round(fee), label };
 }
-function effectiveAnnualRate(principal, fee, emi, months) {
+function effectiveAnnualRate(principal, fee, emi, months2) {
   const net = principal - fee;
   if (net <= 0) return Infinity;
   const pv = (monthlyRate) => {
-    if (monthlyRate === 0) return emi * months;
-    return emi * (1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate;
+    if (monthlyRate === 0) return emi * months2;
+    return emi * (1 - Math.pow(1 + monthlyRate, -months2)) / monthlyRate;
   };
   let lo = 0;
   let hi = 0.2;
@@ -6005,31 +6160,37 @@ function compareLenders(req, source = LENDER_DB) {
     const reasons = [];
     const notes = [];
     if (!product.employmentTypes.includes(req.employmentType)) {
+      const onlyFor = req.employmentType === "self_employed" ? "salaried" : "self-employed";
       reasons.push(
-        req.employmentType === "self_employed" ? "This product is published for salaried applicants only" : "This product is published for self-employed applicants only"
+        `This product is for ${onlyFor} applicants only, per ${criterionSource(product, "employmentTypes")}`
       );
     }
     if (req.amount < product.minLoanAmount) {
-      reasons.push(`Amount below the published minimum (\u20B9${product.minLoanAmount.toLocaleString("en-IN")})`);
+      reasons.push(
+        `Amount below the minimum on ${criterionSource(product, "minLoanAmount")} (\u20B9${product.minLoanAmount.toLocaleString("en-IN")})`
+      );
     }
     if (req.amount > product.maxLoanAmount) {
       reasons.push(`Amount above the published maximum (\u20B9${product.maxLoanAmount.toLocaleString("en-IN")})`);
     }
     if (req.tenureMonths < product.minTenureMonths) {
-      reasons.push(`Tenure shorter than the published minimum (${product.minTenureMonths} months)`);
+      reasons.push(
+        `Tenure shorter than the minimum on ${criterionSource(product, "minTenureMonths")} (${product.minTenureMonths} months)`
+      );
     }
     if (req.tenureMonths > product.maxTenureMonths) {
-      reasons.push(`Tenure longer than the published maximum (${product.maxTenureMonths} months)`);
+      reasons.push(
+        `Tenure longer than the maximum on ${criterionSource(product, "maxTenureMonths")} (${product.maxTenureMonths} months)`
+      );
     }
     if (product.minSalary != null) {
       const incomeWord = req.employmentType === "salaried" ? "salary" : "income";
+      const floor = `minimum monthly ${incomeWord} \u20B9${product.minSalary.toLocaleString("en-IN")} per ${criterionSource(product, "minSalary")}`;
       if (req.monthlyIncome == null) {
-        notes.push(
-          `Requires minimum monthly ${incomeWord} \u20B9${product.minSalary.toLocaleString("en-IN")} \u2014 you haven't shared your income, so this is unverified`
-        );
+        notes.push(`Requires ${floor} \u2014 you haven't shared your income, so this is unverified`);
       } else if (req.monthlyIncome < product.minSalary) {
         reasons.push(
-          `Requires minimum monthly ${incomeWord} \u20B9${product.minSalary.toLocaleString("en-IN")} \u2014 your income is \u20B9${req.monthlyIncome.toLocaleString("en-IN")}`
+          `Requires ${floor} \u2014 your income is \u20B9${req.monthlyIncome.toLocaleString("en-IN")}`
         );
       }
     }
@@ -6125,8 +6286,9 @@ function compareLenders(req, source = LENDER_DB) {
 }
 var CREDIT_BAND_LABELS, CREDIT_BAND_FLOOR, LOAN_TYPE_LABELS, LENDER_TYPE_LABELS;
 var init_lender_compare = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/lib/lender-compare.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/lib/lender-compare.ts"() {
     init_lenders();
+    init_policy_rules();
     CREDIT_BAND_LABELS = {
       below_650: "Below 650",
       "650_700": "650\u2013699",
@@ -6155,14 +6317,14 @@ var init_lender_compare = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/data/personal-loans-data.ts
+// ../../../tmp/space-workspace-253940-atqovT/data/personal-loans-data.ts
 function personalLoansJson() {
   return `${JSON.stringify(PERSONAL_LOANS, null, 2)}
 `;
 }
 var PERSONAL_LOANS, PERSONAL_LOANS_SCRAPED_AT;
 var init_personal_loans_data = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/data/personal-loans-data.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/data/personal-loans-data.ts"() {
     PERSONAL_LOANS = [
       { "lender": "State Bank of India", "code": "SBI", "lenderId": "sbi", "lenderType": "public_sector_bank", "loanType": "personal", "interestRateMin": 10, "interestRateMax": 15, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": null, "tenureMaxMonths": null, "processingFeePercent": 1.5, "processingFeeFlat": null, "processingFeeMin": 1e3, "processingFeeMax": 15e3, "processingFeeNote": "Up to 1.50% of the loan amount + GST, minimum \u20B91,000 and maximum \u20B915,000. 100% waiver for Defence and Platinum/Rhodium salary-package customers; 50% waiver for Government employees and for a CIC score of 800 or above.", "prepaymentCharges": null, "cibilScoreMin": null, "minSalaryMonthly": null, "minSalary": null, "employmentTypes": ["salaried"], "ageMin": null, "ageMax": null, "foirMax": 0.65, "negativeIndustries": null, "documents": null, "sourceUrl": "https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/personal-loans-schemes", "eligibilitySourceUrl": "https://sbi.co.in/web/personal-banking/loans/personal-loans/sbi-personal-loan", "sourceUrls": ["https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/personal-loans-schemes", "https://sbi.co.in/web/personal-banking/loans/personal-loans/sbi-personal-loan"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rate published as 2-year MCLR 8.75% plus a 1.25%\u20136.25% spread, effective 10.00%\u201315.00% p.a. as on 01.04.2026. Salaried only, and only for customers holding an SBI salary package account. SBI publishes an EMI/NMI ceiling of 65% rather than a minimum CIBIL score. SBI's pages are rendered client-side, so the eligibility tabs (minimum salary, tenure band, document list) could not be read by the crawler this run and are left null rather than guessed.", "unpublishedFields": ["loanAmountMin", "tenureMinMonths", "tenureMaxMonths", "processingFeeFlat", "prepaymentCharges", "cibilScoreMin", "minSalaryMonthly", "ageMin", "ageMax", "negativeIndustries", "documents"], "processingFeeCapAmount": 15e3 },
       { "lender": "HDFC Bank", "code": "HDFC", "lenderId": "hdfc-bank", "lenderType": "private_bank", "loanType": "personal", "interestRateMin": 9.99, "interestRateMax": 24, "loanAmountMin": null, "loanAmountMax": 5e6, "tenureMinMonths": 12, "tenureMaxMonths": 60, "processingFeePercent": null, "processingFeeFlat": 6500, "processingFeeMin": null, "processingFeeMax": null, "processingFeeNote": "Up to \u20B96,500 + GST, non-refundable even if the loan is later cancelled or rebooked.", "prepaymentCharges": "Foreclosure on principal outstanding: 4% up to 24 EMIs, 3% after 24 and up to 36 EMIs, 2% after 36 EMIs. Part-payment allowed after the first EMI, up to 25% of principal outstanding, once a financial year and twice in the loan tenure, at the same percentages.", "cibilScoreMin": null, "minSalaryMonthly": 25e3, "minSalary": 25e3, "employmentTypes": ["salaried"], "ageMin": 21, "ageMax": 60, "foirMax": null, "negativeIndustries": null, "documents": null, "sourceUrl": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/interest-rates-and-charges", "eligibilitySourceUrl": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/eligibility", "sourceUrls": ["https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan", "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/interest-rates-and-charges", "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/eligibility"], "scrapedAt": "2026-08-15T14:26:00Z", "updatedAt": "2026-08-15", "notes": "Rack rate for salaried applicants is published as 9.99%\u201324.00%; HDFC also publishes actual Q1 FY2026-27 disbursals of 9.97%\u201324.06% IRR (average 10.89%). Loans up to \u20B950 lakh, and up to \u20B975 lakh subject to eligibility norms. Self-employed applicants are explicitly not eligible for this product. No minimum CIBIL is published as a rule \u2014 the FAQ calls a score above 720 'ideal', so no floor is stored. Under the Golden Edge programme foreclosure is free after 12 EMIs for customers with income \u2265 \u20B975,000 and a loan above \u20B915 lakh.", "unpublishedFields": ["loanAmountMin", "processingFeePercent", "cibilScoreMin", "foirMax", "negativeIndustries", "documents"], "processingFeeCapAmount": null },
@@ -6189,7 +6351,7 @@ var init_personal_loans_data = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/personal-loan-source.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/personal-loan-source.ts
 function databaseId(record) {
   return LENDER_ID_ALIASES[record.lenderId] ?? record.lenderId;
 }
@@ -6213,7 +6375,7 @@ function firstSentence(text) {
   if (sentence.length <= 320) return sentence;
   return `${sentence.slice(0, 300).trimEnd()}\u2026`;
 }
-function mergeProduct(base, record) {
+function mergeProduct2(base, record) {
   const rateMin = record.interestRateMin ?? base.interestRateMin;
   const rateMax = record.interestRateMax ?? Math.max(base.interestRateMax, rateMin);
   const merged = {
@@ -6254,7 +6416,7 @@ function applyPersonalLoanSource(db) {
     return {
       ...lender,
       lastUpdated: record.updatedAt > lender.lastUpdated ? record.updatedAt : lender.lastUpdated,
-      products: { ...lender.products, personal: mergeProduct(base, record) }
+      products: { ...lender.products, personal: mergeProduct2(base, record) }
     };
   });
   return {
@@ -6265,7 +6427,7 @@ function applyPersonalLoanSource(db) {
 }
 var LENDER_ID_ALIASES, BY_DATABASE_ID;
 var init_personal_loan_source = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/lib/personal-loan-source.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/lib/personal-loan-source.ts"() {
     init_personal_loans_data();
     LENDER_ID_ALIASES = {
       "icici-bank": "icici",
@@ -6284,7 +6446,7 @@ var init_personal_loan_source = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/lender-rates-live.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/lender-rates-live.ts
 import { useEffect as useEffect2, useMemo, useState as useState3 } from "react";
 function toNum(value) {
   if (value == null || value === "") return null;
@@ -6326,7 +6488,7 @@ function compareRowRecency(a, b) {
   if (byTime !== 0) return byTime;
   return (toNum(a.id) ?? 0) - (toNum(b.id) ?? 0);
 }
-function mergeProduct2(base, row) {
+function mergeProduct3(base, row) {
   const patch = {};
   let fieldsApplied = 0;
   let fieldsConfirmed = 0;
@@ -6367,7 +6529,7 @@ function mergeProduct2(base, row) {
   return { product: { ...base, ...patch }, fieldsApplied, fieldsConfirmed };
 }
 function mergeRateOverrides(rows) {
-  const source = applyPersonalLoanSource(LENDER_DB);
+  const source = applyPolicyRules(applyPersonalLoanSource(LENDER_DB));
   const bundled = {
     lenders: source.lenders,
     lastUpdated: source.lastUpdated,
@@ -6395,7 +6557,7 @@ function mergeRateOverrides(rows) {
       if (!base) continue;
       const row = newest.get(`${lender.id}|${productType}`);
       if (!row) continue;
-      const merged = mergeProduct2(base, row);
+      const merged = mergeProduct3(base, row);
       if (merged.fieldsApplied === 0 && merged.fieldsConfirmed === 0) continue;
       products[productType] = merged.product;
       lenderFields += merged.fieldsApplied;
@@ -6443,9 +6605,10 @@ function useLiveLenderDb() {
 }
 var RATE_OVERRIDE_TABLE, RATE_PLAUSIBLE_MIN_PCT, RATE_PLAUSIBLE_MAX_PCT, FEE_PLAUSIBLE_MAX_PCT, OVERRIDE_ROW_LIMIT, ISO_DATE_RE, cachedRows, inFlight;
 var init_lender_rates_live = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/lib/lender-rates-live.ts"() {
+  "../../../tmp/space-workspace-253940-atqovT/lib/lender-rates-live.ts"() {
     init_lenders();
     init_personal_loan_source();
+    init_policy_rules();
     RATE_OVERRIDE_TABLE = "lender_rate_overrides";
     RATE_PLAUSIBLE_MIN_PCT = 4;
     RATE_PLAUSIBLE_MAX_PCT = 40;
@@ -6457,7 +6620,7 @@ var init_lender_rates_live = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/apps/LoanCheck/App.tsx
+// ../../../tmp/space-workspace-253940-atqovT/apps/LoanCheck/App.tsx
 var App_exports = {};
 __export(App_exports, {
   default: () => LoanCheck
@@ -6559,15 +6722,15 @@ function extractCriteria(raw) {
   const tenure = t.match(/(\d+(?:\.\d+)?)\s*(months?|mos?|years?|yrs?|yr|saal|sal)\b/);
   if (tenure) {
     const n = parseFloat(tenure[1]);
-    const months = /^(y|s)/.test(tenure[2]) ? Math.round(n * 12) : Math.round(n);
-    if (months >= 3 && months <= 480) out.tenureMonths = months;
+    const months2 = /^(y|s)/.test(tenure[2]) ? Math.round(n * 12) : Math.round(n);
+    if (months2 >= 3 && months2 <= 480) out.tenureMonths = months2;
     t = t.replace(tenure[0], " ");
   } else {
     const worded = t.match(/(?:tenure|term|repay(?:ment)?(?: over| in)?)\D{0,10}(\d{1,3})\b/);
     if (worded) {
-      const months = parseInt(worded[1], 10);
-      if (months >= 3 && months <= 480) {
-        out.tenureMonths = months;
+      const months2 = parseInt(worded[1], 10);
+      if (months2 >= 3 && months2 <= 480) {
+        out.tenureMonths = months2;
         t = t.replace(worded[0], " ");
       }
     }
@@ -6594,13 +6757,13 @@ function parseAnswer(field, raw) {
       const unit = t.match(/(\d+(?:\.\d+)?)\s*(months?|mos?|years?|yrs?|yr|saal|sal)\b/);
       if (unit) {
         const n = parseFloat(unit[1]);
-        const months = /^(y|s)/.test(unit[2]) ? Math.round(n * 12) : Math.round(n);
-        return months >= 3 && months <= 480 ? { tenureMonths: months } : {};
+        const months2 = /^(y|s)/.test(unit[2]) ? Math.round(n * 12) : Math.round(n);
+        return months2 >= 3 && months2 <= 480 ? { tenureMonths: months2 } : {};
       }
       const bare = t.match(/\b(\d{1,3})\b/);
       if (bare) {
-        const months = parseInt(bare[1], 10);
-        if (months >= 3 && months <= 480) return { tenureMonths: months };
+        const months2 = parseInt(bare[1], 10);
+        if (months2 >= 3 && months2 <= 480) return { tenureMonths: months2 };
       }
       return {};
     }
@@ -6743,7 +6906,55 @@ function SourceCitation({ row, tone = "light" }) {
     }
   );
 }
-function BestMatchCard({ row, tied, asOf }) {
+function PolicyRuleCard({
+  lenderId,
+  loanType,
+  tone = "light"
+}) {
+  if (loanType !== "personal") return null;
+  const record = policyRuleFor(lenderId);
+  if (!record) return null;
+  const lines = policyRuleLines(record);
+  if (lines.length === 0) return null;
+  const dark = tone === "dark";
+  const muted = dark ? "text-[var(--space-brand-primary-100)]" : "text-[var(--space-text-muted)]";
+  const strong = dark ? "text-[var(--space-text-on-primary)]" : "text-[var(--space-text-primary)]";
+  return /* @__PURE__ */ jsxs8(
+    "details",
+    {
+      className: `mt-2 rounded-lg border px-2.5 py-1.5 ${dark ? "border-white/20 bg-white/10" : "border-[var(--space-border-default)] bg-[var(--space-surface-muted)]"}`,
+      "data-testid": `policy-rules-${lenderId}`,
+      children: [
+        /* @__PURE__ */ jsxs8(
+          "summary",
+          {
+            className: `cursor-pointer text-[11px] font-semibold ${dark ? "text-[var(--space-text-on-primary)]" : "text-[var(--space-text-brand)]"}`,
+            children: [
+              "Approval rules \u2014 what ",
+              shortLenderName(record.lender),
+              " actually asks for"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsx10("dl", { className: "mt-1.5 grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2", children: lines.map((line) => /* @__PURE__ */ jsxs8("div", { children: [
+          /* @__PURE__ */ jsx10("dt", { className: `text-[10px] ${muted}`, children: line.label }),
+          /* @__PURE__ */ jsx10("dd", { className: `text-[11px] font-medium leading-snug ${strong}`, children: line.value })
+        ] }, line.label)) }),
+        record.remark && /* @__PURE__ */ jsxs8("p", { className: `mt-1.5 text-[10px] leading-snug ${dark ? muted : "text-[var(--space-text-secondary)]"}`, children: [
+          "Also on file: ",
+          record.remark
+        ] }),
+        /* @__PURE__ */ jsx10("p", { className: `mt-1.5 text-[10px] leading-snug ${muted}`, children: DESK_POLICY_CAVEAT })
+      ]
+    }
+  );
+}
+function BestMatchCard({
+  row,
+  tied,
+  asOf,
+  loanType
+}) {
   return /* @__PURE__ */ jsxs8(
     "div",
     {
@@ -6806,12 +7017,13 @@ function BestMatchCard({ row, tied, asOf }) {
           "Caveat: ",
           note
         ] }, i)) }),
+        /* @__PURE__ */ jsx10(PolicyRuleCard, { lenderId: row.lenderId, loanType, tone: "dark" }),
         /* @__PURE__ */ jsx10("p", { className: "mt-2", children: /* @__PURE__ */ jsx10(SourceCitation, { row, tone: "dark" }) })
       ]
     }
   );
 }
-function RankedRow({ row, rank }) {
+function RankedRow({ row, rank, loanType }) {
   return /* @__PURE__ */ jsx10(
     "div",
     {
@@ -6863,6 +7075,7 @@ function RankedRow({ row, rank }) {
             "Caveat: ",
             note
           ] }, i)),
+          /* @__PURE__ */ jsx10(PolicyRuleCard, { lenderId: row.lenderId, loanType }),
           /* @__PURE__ */ jsx10("p", { className: "mt-1", children: /* @__PURE__ */ jsx10(SourceCitation, { row }) })
         ] })
       ] })
@@ -6880,7 +7093,7 @@ function ResultBlock({ result }) {
   } else if (eligible.length < 3) {
     countLine = `Only ${eligible.length} lender${eligible.length === 1 ? "" : "s"} in our database meet your eligibility criteria. Here's what we found:`;
   } else {
-    countLine = `${eligible.length} lenders in our database meet your published eligibility criteria, ranked by effective cost (EMI plus processing fee).`;
+    countLine = `${eligible.length} lenders in our database meet the eligibility criteria we hold for you, ranked by effective cost (EMI plus processing fee).`;
   }
   return /* @__PURE__ */ jsxs8("div", { className: "space-y-3", "data-testid": "loan-check-results", children: [
     /* @__PURE__ */ jsxs8("div", { className: "space-y-1.5", children: [
@@ -6893,16 +7106,25 @@ function ResultBlock({ result }) {
     ] }),
     /* @__PURE__ */ jsx10("p", { className: "text-[13px] font-semibold leading-snug text-[var(--space-text-primary)]", children: countLine }),
     tiedGroup.length > 0 && /* @__PURE__ */ jsxs8("div", { className: "space-y-2", children: [
-      tiedGroup.map((row) => /* @__PURE__ */ jsx10(BestMatchCard, { row, tied: tiedGroup.length > 1, asOf: result.lastUpdated }, row.lenderId)),
+      tiedGroup.map((row) => /* @__PURE__ */ jsx10(
+        BestMatchCard,
+        {
+          row,
+          tied: tiedGroup.length > 1,
+          asOf: result.lastUpdated,
+          loanType: result.requirements.loanType
+        },
+        row.lenderId
+      )),
       tiedGroup.length > 1 && /* @__PURE__ */ jsx10("p", { className: "text-[11px] leading-snug text-[var(--space-text-secondary)]", children: "These lenders are within 0.1% effective cost of each other for your inputs \u2014 the published data can't honestly separate them, so they share the top spot." })
     ] }),
     eligible.length > 0 && /* @__PURE__ */ jsxs8("div", { children: [
       /* @__PURE__ */ jsx10("h4", { className: "mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--space-text-muted)]", children: "Lenders you qualify for \u2014 lowest effective cost first" }),
-      /* @__PURE__ */ jsx10("div", { className: "space-y-2", children: eligible.map((row, i) => /* @__PURE__ */ jsx10(RankedRow, { row, rank: i + 1 }, row.lenderId)) })
+      /* @__PURE__ */ jsx10("div", { className: "space-y-2", children: eligible.map((row, i) => /* @__PURE__ */ jsx10(RankedRow, { row, rank: i + 1, loanType: result.requirements.loanType }, row.lenderId)) })
     ] }),
     result.outOfRange.length > 0 && /* @__PURE__ */ jsxs8("div", { "data-testid": "out-of-reach", children: [
       /* @__PURE__ */ jsx10("h4", { className: "mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--space-text-muted)]", children: "Likely out of reach for your profile" }),
-      /* @__PURE__ */ jsx10("p", { className: "mb-2 text-[11px] leading-snug text-[var(--space-text-secondary)]", children: "Shown so nothing is hidden \u2014 these are excluded from the ranking because of each lender's own published criteria. Published criteria aren't the final word; lenders assess full applications individually." }),
+      /* @__PURE__ */ jsx10("p", { className: "mb-2 text-[11px] leading-snug text-[var(--space-text-secondary)]", children: "Shown so nothing is hidden \u2014 these are excluded from the ranking by each lender's own criteria, and every reason below says whether it came from the lender's published page or from Loanley's desk record of its credit policy. Neither is the final word; lenders assess full applications individually." }),
       /* @__PURE__ */ jsx10("div", { className: "space-y-2 opacity-70", children: result.outOfRange.map((row) => /* @__PURE__ */ jsxs8(
         "div",
         {
@@ -6925,6 +7147,11 @@ function ResultBlock({ result }) {
       "Not compared (no published rate-card data for this loan type in our database yet): ",
       result.notCovered.join(", "),
       "."
+    ] }),
+    result.requirements.loanType === "personal" && POLICY_RULES_AWAITING_RATE_CARD.length > 0 && /* @__PURE__ */ jsxs8("p", { className: "text-[10px] leading-snug text-[var(--space-text-muted)]", children: [
+      "We also hold approval rules for ",
+      POLICY_RULES_AWAITING_RATE_CARD.map((record) => record.lender).join(", "),
+      ", but they are not ranked here yet: a lender only enters the ranking once its own published rate card has been scraped, and those are still to be collected."
     ] }),
     /* @__PURE__ */ jsxs8("p", { className: "border-t border-[var(--space-border-default)] pt-2 text-[10px] leading-snug text-[var(--space-text-muted)]", children: [
       "For context, major Indian banks and NBFCs publish ",
@@ -7036,8 +7263,8 @@ function extractOffer(raw) {
   const tenure = rest.match(/(\d+(?:\.\d+)?)\s*(months?|mos?|years?|yrs?|yr|saal)\b/);
   if (tenure) {
     const n = parseFloat(tenure[1]);
-    const months = /^(y|s)/.test(tenure[2]) ? Math.round(n * 12) : Math.round(n);
-    if (months >= 3 && months <= 480) out.tenureMonths = months;
+    const months2 = /^(y|s)/.test(tenure[2]) ? Math.round(n * 12) : Math.round(n);
+    if (months2 >= 3 && months2 <= 480) out.tenureMonths = months2;
     rest = rest.replace(tenure[0], " ");
   }
   const amt = parseMoney(rest);
@@ -7575,10 +7802,11 @@ The policy repo rate is ${LENDER_DB.rateContext.rbiRepoRatePct}% as of ${LENDER_
 }
 var LOAN_MATH_ENDPOINT, PL_DATA_FILENAME, TRUST_HEADER, seq, nextId, userSays, bot, FIELD_ORDER, FIELD_LABELS, MONEY_UNITS, SEEK_PATTERNS, RBI_SOURCE, FAQ, COVERAGE_CAVEATS, OFFER_ORDER, WELCOME, WELCOME_REPLIES, AFTER_RESULT_REPLIES, ABOUT_HEADLINE, ABOUT_PARAGRAPHS, ABOUT_TRUST_LINE, NAV_BUTTON_CLASS;
 var init_App = __esm({
-  "../../../tmp/space-workspace-253940-SkdnUX/apps/LoanCheck/App.tsx"() {
+  "../../../tmp/space-workspace-253940-atqovT/apps/LoanCheck/App.tsx"() {
     init_LoanleyCards();
     init_lender_compare();
     init_lender_rates_live();
+    init_policy_rules();
     init_personal_loans_data();
     init_loan_benchmarks();
     init_lenders();
@@ -7718,7 +7946,7 @@ var init_App = __esm({
   }
 });
 
-// ../../../tmp/space-workspace-253940-SkdnUX/main.tsx
+// ../../../tmp/space-workspace-253940-atqovT/main.tsx
 import React, { Suspense as Suspense2, useState as useState11, useEffect as useEffect9, Component as Component2 } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -7745,7 +7973,7 @@ function resolveCompiledPublicAppId(publicRoute, hash, privateRoute) {
   return null;
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/SpaceRuntimeContext.tsx
+// ../../../tmp/space-workspace-253940-atqovT/SpaceRuntimeContext.tsx
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { jsx } from "react/jsx-runtime";
 var SpaceRuntimeContext = createContext(null);
@@ -8700,11 +8928,11 @@ function useSpaceRuntime() {
   return context;
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/Desktop.tsx
+// ../../../tmp/space-workspace-253940-atqovT/Desktop.tsx
 import { useState as useState9, Suspense, useEffect as useEffect7, useRef as useRef5, useMemo as useMemo4, useCallback as useCallback3, Component } from "react";
 import { Bot as Bot2, Check as Check2, Folder as Folder2, X as X3, Plus as Plus2, Menu, PanelLeftClose, PanelLeftOpen, ChevronLeft, Activity, Maximize2, Minimize2, Moon, Heart as Heart2, Calendar, Users, FileText, BarChart, Settings as SettingsIcon, MessageCircle, Plane, TrendingUp, LineChart, Dumbbell, Brain, Target, Zap, Star, Clock as Clock2, CheckCircle, List, BookOpen as BookOpen3, Coffee, Music, Camera, MapPin, Wallet, ShoppingCart, Gift, Lightbulb, Sparkles as Sparkles3, Rocket as Rocket2, Home, Building, Globe, Mail, Phone, Video, Mic, Image, Play, Pause, Volume2, Wifi, Cloud, Sun, Umbrella, Thermometer, Wind, Droplets, Leaf, Flower2, Mountain, Waves, Compass as Compass2, Map as Map2, Navigation, Car, Bike, Ship, Award, Trophy, Medal, Crown, Diamond, Gem, Key, Lock, Unlock, Shield, Eye as Eye3, Search as Search2, Filter, SortAsc, Download, Upload, Share2, Link, ExternalLink as ExternalLink2, Copy, Clipboard, Trash2, Edit as Edit2, Pencil, PenTool, Scissors, Bookmark, Flag, Bell, AlertCircle as AlertCircle2, Info as Info2, HelpCircle, XCircle as XCircle2, CheckCircle2 as CheckCircle24, Circle, Square, Triangle, Hexagon, Octagon, Hash, AtSign, DollarSign, Percent, Calculator as Calculator2, Code, Terminal, Database, Server, Cpu, Monitor, Smartphone, Tablet, Laptop, Watch, Headphones, Speaker, Radio, Tv, Printer, Scan, QrCode, Barcode, CreditCard as CreditCard2, Receipt, Banknote, PiggyBank, TrendingDown, AreaChart, PieChart, Scale as Scale3, Landmark } from "lucide-react";
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/AgentChatView.tsx
 import {
   Bot,
   Send as Send2,
@@ -8726,7 +8954,7 @@ import { useMemo as useMemo3, useRef as useRef3 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/friendly-terms.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/friendly-terms.ts
 var TOOL_NAME_PREFIX_RE = /^(?:functions\.|tools\.)/;
 var toolNameAliases = {
   "edit_file": "edit",
@@ -8798,7 +9026,7 @@ function getToolColor(toolName) {
   return toolColors[normalizeToolName(toolName)] || "text-gray-500";
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/colors.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/colors.ts
 var brand = {
   // Primary brand color - used for main actions, buttons, links
   primary: {
@@ -9103,10 +9331,10 @@ var settingsStyles = {
   saveButton: (disabled) => `w-full px-4 py-2.5 rounded-lg ${tw.button.primary} flex items-center justify-center gap-2 ${disabled ? tw.button.disabled : ""}`
 };
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/AgentChatView.tsx
 init_LoanleyCards();
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/LenderCompareCard.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/LenderCompareCard.tsx
 init_LoanleyCards();
 init_lender_compare();
 init_lender_rates_live();
@@ -9490,7 +9718,7 @@ function LoanleyCompareCard({ raw, onSubmit }) {
   );
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChatView.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/AgentChatView.tsx
 import { Fragment as Fragment3, jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
 function WorkingIndicator({
   lastAction,
@@ -10044,11 +10272,11 @@ function AgentChatView({ runtime }) {
   );
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/useAgentChatRuntime.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/useAgentChatRuntime.tsx
 import { useState as useState5, useEffect as useEffect3, useRef as useRef4, useCallback as useCallback2 } from "react";
 import { flushSync } from "react-dom";
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/tenant-delegation-scope.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/tenant-delegation-scope.ts
 function getTenantDelegationScope() {
   if (typeof window === "undefined") return null;
   const injected = window.__TENANT_DELEGATION__;
@@ -10080,7 +10308,7 @@ function isTenantChatSuppressed() {
   return scope?.chatSuppressed === true;
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/useAgentChatRuntime.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/useAgentChatRuntime.tsx
 var globalSendingLock = false;
 var lastSendTimestamp = 0;
 var REPLY_STALL_TIMEOUT_MS = 9e4;
@@ -11426,14 +11654,14 @@ function useAgentChatRuntime(props) {
   };
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/AgentChat.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/AgentChat.tsx
 import { jsx as jsx5 } from "react/jsx-runtime";
 function AgentChat(props) {
   const runtime = useAgentChatRuntime(props);
   return /* @__PURE__ */ jsx5(AgentChatView, { runtime });
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/FileBrowser.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/FileBrowser.tsx
 import { useState as useState6, useEffect as useEffect4 } from "react";
 import { File as File2, Folder, Eye, Edit } from "lucide-react";
 import { jsx as jsx6, jsxs as jsxs4 } from "react/jsx-runtime";
@@ -11571,7 +11799,7 @@ function FileBrowser({ fileAccessLogs = [] }) {
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/EmailGate.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/EmailGate.tsx
 import { useState as useState7, useEffect as useEffect5 } from "react";
 import {
   ArrowRight,
@@ -12987,7 +13215,7 @@ function EmailGate({
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/components/Settings.tsx
+// ../../../tmp/space-workspace-253940-atqovT/components/Settings.tsx
 import { useState as useState8, useEffect as useEffect6 } from "react";
 import { Save as Save2, CreditCard, LogOut, Clock, CheckCircle2 as CheckCircle23, AlertCircle, Loader2 as Loader23, ExternalLink, CalendarX } from "lucide-react";
 import { Fragment as Fragment5, jsx as jsx8, jsxs as jsxs6 } from "react/jsx-runtime";
@@ -13451,7 +13679,7 @@ function Settings({ spaceId }) {
   ] }) });
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/tenant-delegation-canvas.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/tenant-delegation-canvas.ts
 function isTenantDelegationCanvas() {
   if (typeof window === "undefined") return false;
   const layout = new URLSearchParams(window.location.search).get("layout");
@@ -13459,7 +13687,7 @@ function isTenantDelegationCanvas() {
   return !!window.__TENANT_DELEGATION__ || !!window.__TENANT_DELEGATION_CANVAS__ || layout === "canvas-only";
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/lib/chat-user-message-event.ts
+// ../../../tmp/space-workspace-253940-atqovT/lib/chat-user-message-event.ts
 function listenForChatUserMessages(target, handlers) {
   const onUserMessage = (event) => {
     const detail = event.detail;
@@ -13486,7 +13714,7 @@ function listenForChatUserMessages(target, handlers) {
   return () => target.removeEventListener("audos:chat-user-message", onUserMessage);
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/Desktop.tsx
+// ../../../tmp/space-workspace-253940-atqovT/Desktop.tsx
 import { Fragment as Fragment6, jsx as jsx9, jsxs as jsxs7 } from "react/jsx-runtime";
 var PRIMARY_THREAD_ID = "main";
 var THREAD_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
@@ -14672,7 +14900,7 @@ function SpaceDesktop({
   ] });
 }
 
-// ../../../tmp/space-workspace-253940-SkdnUX/main.tsx
+// ../../../tmp/space-workspace-253940-atqovT/main.tsx
 import { Fragment as Fragment8, jsx as jsx11, jsxs as jsxs9 } from "react/jsx-runtime";
 window.React = React;
 var CONFIG = {
