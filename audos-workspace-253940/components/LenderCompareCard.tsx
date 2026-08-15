@@ -120,8 +120,14 @@ function PolicyRulesDisclosure({ lenderId, loanType }: { lenderId: string; loanT
           </div>
         ))}
       </dl>
-      {record.remark && (
-        <p className="mt-1.5 text-[10px] leading-snug text-[var(--space-text-secondary)]">Also on file: {record.remark}</p>
+      {record.specialFeatures.length > 0 && (
+        <ul className="mt-1.5 space-y-0.5">
+          {record.specialFeatures.map((feature, i) => (
+            <li key={i} className="text-[10px] leading-snug text-[var(--space-text-secondary)]">
+              • {feature}
+            </li>
+          ))}
+        </ul>
       )}
       <p className="mt-1.5 text-[10px] leading-snug text-[var(--space-text-muted)]">{DESK_POLICY_CAVEAT}</p>
     </details>

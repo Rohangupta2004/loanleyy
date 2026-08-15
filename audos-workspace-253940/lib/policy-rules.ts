@@ -2,22 +2,22 @@
  * policy-rules — layers Loanley's desk credit policy over the lender database.
  *
  * data/policy_rules.json (mirrored for the bundle in data/policy-rules-data.ts)
- * is the founder's PersonalLoan_RuleEngine sheet: how each lender actually
+ * is the founder's lender policy document: how each of 29 lenders actually
  * approves a personal loan. It exists because a lender publishes a rate card
  * and almost never its approval rules — which is why so many rows in
  * data/personal_loans.json carry `unpublishedFields` for exactly the criteria a
  * borrower's answer turns on (age band, salary floor, employment vintage,
- * company type, no-history CIBIL, balance transfers).
+ * company type, FOIR, no-history CIBIL, balance transfers).
  *
  * Two rules this module exists to enforce:
  *  1. A desk-policy criterion is NEVER presented as a published one. Every
  *     field this layer sets is named in the product's `criteriaFromDeskPolicy`,
  *     and lib/lender-compare.ts reads that list to say where the rule came from
  *     in the reason a borrower is shown.
- *  2. It binds only where the sheet actually records a figure, and never leaves
+ *  2. It binds only where the policy actually states a figure, and never leaves
  *     an incoherent product behind — a desk minimum above the lender's own
- *     maximum is dropped rather than applied, so no borrower is refused by an
- *     inverted range.
+ *     maximum, or a desk maximum below its minimum, is dropped rather than
+ *     applied, so no borrower is refused by an inverted range.
  *
  * A desk figure that matches what the lender already publishes changes nothing
  * and is NOT marked as desk-sourced: the published page corroborates it, so the
@@ -26,11 +26,16 @@
  * Ranking is untouched: this layer sets no rate and no fee, so it cannot move a
  * lender up or down the list. It only changes who qualifies, and says why.
  */
-import { POLICY_RULES, POLICY_RULES_AWAITING_RATE_CARD, POLICY_RULE_SHEET, policyRuleFor } from '../data/policy-rules-data';
+import {
+  POLICY_RULES,
+  POLICY_RULES_AWAITING_RATE_CARD,
+  POLICY_RULE_SOURCE,
+  policyRuleFor,
+} from '../data/policy-rules-data';
 import type { PolicyRuleRecord } from '../data/policy-rules-data';
 import type { Lender, LenderDatabase, LenderProduct } from '../data/lenders';
 
-export { POLICY_RULES, POLICY_RULES_AWAITING_RATE_CARD, POLICY_RULE_SHEET, policyRuleFor };
+export { POLICY_RULES, POLICY_RULES_AWAITING_RATE_CARD, POLICY_RULE_SOURCE, policyRuleFor };
 export type { PolicyRuleRecord };
 
 /**
@@ -54,7 +59,7 @@ export const DESK_POLICY_CAVEAT =
 
 /**
  * Layer one lender's desk policy over its published personal-loan product.
- * Only the criteria the sheet records are touched, and each one is named so the
+ * Only the criteria the policy states are touched, and each one is named so the
  * comparison engine can attribute it.
  */
 function mergeProduct(base: LenderProduct, record: PolicyRuleRecord): LenderProduct {
@@ -69,8 +74,9 @@ function mergeProduct(base: LenderProduct, record: PolicyRuleRecord): LenderProd
     }
   }
 
-  // A desk minimum above the lender's own published maximum would refuse every
-  // borrower for a reason the lender never set. Drop it instead.
+  // A desk floor above the lender's own published ceiling (or a desk ceiling
+  // below its floor) would refuse every borrower for a reason the lender never
+  // set. Drop it instead.
   if (
     record.loanAmountMin != null &&
     record.loanAmountMin !== base.minLoanAmount &&
@@ -78,6 +84,14 @@ function mergeProduct(base: LenderProduct, record: PolicyRuleRecord): LenderProd
   ) {
     merged.minLoanAmount = record.loanAmountMin;
     fromDesk.push('minLoanAmount');
+  }
+  if (
+    record.loanAmountMax != null &&
+    record.loanAmountMax !== base.maxLoanAmount &&
+    record.loanAmountMax >= merged.minLoanAmount
+  ) {
+    merged.maxLoanAmount = record.loanAmountMax;
+    fromDesk.push('maxLoanAmount');
   }
 
   const tenureMin = record.tenureMinMonths ?? base.minTenureMonths;
@@ -105,8 +119,8 @@ function mergeProduct(base: LenderProduct, record: PolicyRuleRecord): LenderProd
 
 /**
  * The lender database with each personal-loan product's approval criteria set
- * from the desk policy sheet. Lenders the sheet does not cover, and every other
- * loan type, are returned untouched.
+ * from the desk policy record. Lenders the policy does not cover, and every
+ * other loan type, are returned untouched.
  */
 export function applyPolicyRules(db: LenderDatabase): LenderDatabase {
   const lenders: Lender[] = db.lenders.map((lender) => {
@@ -122,7 +136,7 @@ export function applyPolicyRules(db: LenderDatabase): LenderDatabase {
   return { ...db, lenders };
 }
 
-/** Which criteria on a product came from the desk sheet rather than a rate card. */
+/** Which criteria on a product came from the desk record rather than a rate card. */
 export function isDeskPolicyCriterion(product: LenderProduct, field: string): boolean {
   return (product as DeskPolicyProduct).criteriaFromDeskPolicy?.includes(field) ?? false;
 }
@@ -140,11 +154,6 @@ function rupees(value: number): string {
   return `₹${Math.round(value).toLocaleString('en-IN')}`;
 }
 
-function yesNo(value: boolean | null, yes = 'Yes', no = 'No'): string | null {
-  if (value == null) return null;
-  return value ? yes : no;
-}
-
 function years(value: number | null): string | null {
   if (value == null) return null;
   if (value === 1) return '1 year';
@@ -156,49 +165,73 @@ function months(value: number | null): string | null {
   return value === 1 ? '1 month' : `${value} months`;
 }
 
-/** What kind of employer the lender will fund, in one line. */
-function companyRule(record: PolicyRuleRecord): string | null {
-  if (record.onlyListedCompanyAccepted === true) return 'Listed companies only';
-  if (record.nonListedCompanyAccepted === true) return 'Listed and non-listed companies';
-  if (record.listedCompanyAccepted === true) return 'Listed companies';
-  return null;
+function range(min: number | null, max: number | null, unit: string): string | null {
+  if (min == null && max == null) return null;
+  if (min == null) return `Up to ${max} ${unit}`;
+  if (max == null) return `From ${min} ${unit}`;
+  return `${min}–${max} ${unit}`;
 }
 
-/** The no-credit-history rule, spelled out rather than left as 'CIBIL -1'. */
-function noHistoryRule(record: PolicyRuleRecord): string | null {
-  if (record.cibilMinusOneAccepted == null) return null;
-  if (!record.cibilMinusOneAccepted) return 'Not considered';
-  if (record.cibilMinusOneMaxAmount != null) {
-    return `Considered, up to ${rupees(record.cibilMinusOneMaxAmount)}`;
+function amountRange(min: number | null, max: number | null): string | null {
+  if (min == null && max == null) return null;
+  if (min == null) return `Up to ${rupees(max as number)}`;
+  if (max == null) return `From ${rupees(min)}`;
+  return `${rupees(min)} – ${rupees(max)}`;
+}
+
+/** The credit-history rule, spelled out rather than left as 'CIBIL -1'. */
+function creditHistoryRule(record: PolicyRuleRecord): string | null {
+  const noHistory: string[] = [];
+  if (record.cibilMinusOneAccepted === true) {
+    noHistory.push(
+      record.cibilMinusOneMaxAmount != null
+        ? `no credit history considered up to ${rupees(record.cibilMinusOneMaxAmount)}`
+        : 'no credit history considered',
+    );
+  } else if (record.cibilMinusOneAccepted === false) {
+    noHistory.push('an applicant with no credit history is not considered');
   }
-  return `Considered — ${record.cibilMinusOneRule}`;
+
+  if (record.cibilMinScore != null) {
+    const tail = noHistory.length > 0 ? `; ${noHistory.join('; ')}` : '';
+    return `Minimum CIBIL ${record.cibilMinScore}${tail}`;
+  }
+  if (noHistory.length === 0) return null;
+  const sentence = noHistory.join('; ');
+  return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}`;
+}
+
+/** What this lender asks for on top of the standard document set. */
+function documentsRule(record: PolicyRuleRecord): string | null {
+  const parts = [...POLICY_RULE_SOURCE.standardDocuments.slice(0, 1)];
+  if (record.bankStatementMonths != null) parts.push(`${record.bankStatementMonths} months' bank statements`);
+  parts.push('PAN and Aadhaar');
+  if (record.form16Required) parts.push('Form 16');
+  return parts.join(', ');
 }
 
 /**
- * The lender's approval rules as a borrower reads them. Blank cells are left
- * out entirely rather than shown as a guess.
+ * The lender's approval rules as a borrower reads them. Anything the policy
+ * leaves blank is left out entirely rather than shown as a guess.
  */
 export function policyRuleLines(record: PolicyRuleRecord): PolicyRuleLine[] {
   const candidates: Array<[string, string | null]> = [
-    ['Age', record.ageMin != null && record.ageMax != null ? `${record.ageMin}–${record.ageMax} years` : null],
-    ['Minimum loan', record.loanAmountMin != null ? rupees(record.loanAmountMin) : null],
-    ['Minimum salary', record.minSalaryRule || null],
-    ['Salary must be credited by', record.salaryCreditMode],
-    ['Salary slips', yesNo(record.salarySlipsRequired, 'Required', 'Not required')],
-    [
-      'Tenure',
-      record.tenureMinMonths != null && record.tenureMaxMonths != null
-        ? `${record.tenureMinMonths}–${record.tenureMaxMonths} months`
-        : null,
-    ],
+    ['Age', range(record.ageMin, record.ageMax, 'years')],
+    ['Loan amount', amountRange(record.loanAmountMin, record.loanAmountMax)],
+    ['Minimum salary (₹ a month)', record.minSalaryRule || null],
+    ['Tenure', range(record.tenureMinMonths, record.tenureMaxMonths, 'months')],
     ['Time in current job', months(record.presentEmploymentMinMonths)],
     ['Total work experience', years(record.totalEmploymentMinYears)],
-    ['Employer', companyRule(record)],
-    ['Employer registered (MCA)', record.companyMcaVintageYears != null ? years(record.companyMcaVintageYears) : null],
-    ['Form 16', yesNo(record.form16Mandatory, 'Mandatory', 'Not mandatory')],
-    ['No credit history (CIBIL -1)', noHistoryRule(record)],
-    ['Balance transfers', record.balanceTransferRule || null],
-    ['Rented / bachelor accommodation', record.accommodationRule || null],
+    ['Employer', record.companyRule],
+    ['FOIR — share of income EMIs may use', record.foirRule],
+    ['Credit history', creditHistoryRule(record)],
+    ['Lock-in', record.lockingPeriod],
+    ['Foreclosure', record.foreclosureRule],
+    ['Part payment', record.partPaymentRule],
+    ['Top-up', record.topUpRule],
+    ['Balance transfers', record.balanceTransferRule],
+    ['Rented / bachelor accommodation', record.accommodationRule],
+    ['Documents', documentsRule(record)],
   ];
 
   return candidates
@@ -206,7 +239,7 @@ export function policyRuleLines(record: PolicyRuleRecord): PolicyRuleLine[] {
     .map(([label, value]) => ({ label, value }));
 }
 
-/** How much of the lender database the desk sheet now covers. */
+/** How much of the lender database the desk policy record now covers. */
 export function policyRuleCoverage(): { withPolicy: number; awaitingRateCard: number; total: number } {
   return {
     withPolicy: POLICY_RULES.filter((record) => record.inLenderDatabase).length,
