@@ -1,0 +1,150 @@
+{
+  "businessPlan": "## Business Overview\nLoanley\n\n## Customer Profile\nTarget customers identified from business context\n\n### Pain Points\n- Borrowers come to Loanley because choosing a loan feels overwhelming — the numbers are confusing, the trade-offs are hidden, and a bad choice can cost thousands over time. They want to understand what they can afford, compare options honestly, and feel confident before they sign anything. Ultimately, they're trying to borrow smart: get the right loan for their situation, at a cost they can live with, without nasty surprises later.\n\n## Key Problems\n- **Borrowers come to Loanley because choosing a loan **: Borrowers come to Loanley because choosing a loan feels overwhelming — the numbers are confusing, the trade-offs are hidden, and a bad choice can cost thousands over time. They want to understand what they can afford, compare options honestly, and feel confident before they sign anything. Ultimately, they're trying to borrow smart: get the right loan for their situation, at a cost they can live with, without nasty surprises later.\n\n## Customer Journey\n# Loanley Journey Guide\n\n## 1. USER GOALS\n\nBorrowers come to Loanley because choosing a loan feels overwhelming — the numbers are confusing, the trade-offs are hidden, and a bad choice can cost thousands over time. They want to understand what they can afford, compare options honestly, and feel confident before they sign anything. Ultimately, they're trying to borrow smart: get the right loan for their situation, at a cost they can live with, without nasty surprises later.\n\n---\n\n## 2. QUALIFYING QUESTIONS\n\n**What are you borrowing for?**\n\n1. A home (mortgage or refinance)\n2. A car or personal expense\n3. A business or investment\n\n**Where are you in the process?**\n\n1. Just exploring — I want to know what's possible\n2. Comparing specific offers I've already received\n3. Ready to decide — I need help choosing between finalists\n\n---\n\n## 3. JOURNEY NARRATIVE\n\nMost users start with a vague question — \"Can I afford this?\" or \"Which loan is actually cheaper?\" The agent's job is to turn that into clarity, not a lecture. Early on, it asks a few quick questions about purpose, timeline, and comfort with risk, then walks them through a calculator so they see real numbers: monthly payment, total interest, and what happens if rates or income change.\n\nFrom there, the conversation naturally branches. Someone comparing two offers gets a side-by-side breakdown in plain language — not just APR, but total cost over the life of the loan and what each option means for their cash flow. Someone still exploring gets risk explanations tailored to their situation: what fixed vs. variable really means for *them*, not in the abstract.\n\nThe agent learns with every exchange. It remembers what they care about most — lowest payment, lowest total cost, flexibility, or speed — and adjusts recommendations accordingly. By the end, users don't just have an answer; they understand *why* it's the right answer for their goals.\n\n---\n\n## 4. APP SUPPORT MAP\n\n**Creation tools** (calculators, scenario builders) work best early — when users need to model \"what if\" before they have offers in hand. **Tracking tools** (saved comparisons, payment timelines, rate alerts) help mid-journey, when they're weighing options over days or weeks and don't want to lose their work. **Automation tools** (pre-qualification workflows, document checklists, renewal reminders) fit when someone is ready to act or wants ongoing peace of mind after they borrow. Recommend creation first for explorers, tracking for active comparers, and automation when they're close to committing or managing an existing loan.\n\n---\n\n## 5. COMMUNITY OPPORTUNITIES\n\nUsers benefit from seeing anonymized patterns — what others with similar profiles chose, what they wish they'd known, and common mistakes in their loan type. Shared intelligence like \"borrowers in your range often underestimate closing costs\" or \"most people who chose variable rates in year X regretted it when...\" helps people decide faster and with more confidence. The entrepreneur can harness customer experiences — structured feedback after decisions, optional \"what I'd do differently\" stories — to continuously improve guidance for everyone without exposing private financial details.\n\n---\n\n## 6. MONETIZATION HOOK\n\nThe \"aha\" moment happens when a user runs their numbers side-by-side and realizes one \"cheaper-looking\" loan actually costs them $8,000 more over five years — or that a slightly higher payment saves them from a risky structure they almost chose. That's when paying feels obvious: they've already received personalized clarity worth more than the subscription price.\n\nThe first payment is triggered by a specific insight — a saved comparison, a risk report, or a \"here's your best fit\" recommendation they can't get elsewhere for free. Staying subscribed is different: it's about ongoing value — rate change alerts, refinance timing nudges, and updated comparisons when life changes — not repeating that initial revelation.\n\nThe free tier should prove the agent understands their situation: basic calculators, one comparison, and plain-language risk explanations. Behind the paywall sit unlimited comparisons, saved scenarios, personalized alerts, and exportable reports they can share with a partner or advisor. Design backward from the payment moment: right before they decide to pay, they need to feel \"I finally understand this — and I don't want to lose this clarity or start over from scratch.\"\n\n## AI Tool Suite\n### Offer Stack\n**Purpose**: Save and compare loan offers side-by-side with total cost over the loan life and plain-language risk flags—not just APR.\n**User Story**: I pasted two dealer quotes and finally saw which one costs $8,000 more over five years—not just which has the lower monthly payment.\n\n---\n*Generated on 8/4/2026*\n",
+  "workspaceId": "894a0c15-9fad-420f-845d-91eb624ca81c",
+  "configId": 253940,
+  "name": "Loanley",
+  "tagline": "See clearly. Borrow wisely.",
+  "logoUrl": "https://storage.googleapis.com/audos-images/brand-icons/82dce1ff-ad18-4e65-8659-04f670f013c1.mono.png",
+  "iconUrl": "https://storage.googleapis.com/audos-images/brand-icons/82dce1ff-ad18-4e65-8659-04f670f013c1.mono.png",
+  "logoOnDarkUrl": "https://storage.googleapis.com/audos-images/brand-icons/82dce1ff-ad18-4e65-8659-04f670f013c1.mono.png",
+  "colors": {
+    "primary": "#1b3a5c",
+    "highlight": "#24486e",
+    "contrast": "#ffffff",
+    "secondary": "#24486e",
+    "accent": "#f5a623",
+    "primaryScale": {
+      "50": "#edf1f6",
+      "100": "#d8e1ea",
+      "200": "#b4c4d5",
+      "500": "#21456c",
+      "600": "#1b3a5c",
+      "700": "#15304d",
+      "900": "#0d2136"
+    },
+    "highlightScale": {
+      "50": "#eef3f8",
+      "100": "#dce6ef",
+      "200": "#bbcdde",
+      "500": "#2a517a",
+      "600": "#24486e",
+      "700": "#1d3c5c",
+      "900": "#122a42"
+    },
+    "surfaces": {
+      "page": "#f7f7f5",
+      "pageAlt": "#ffffff",
+      "gradientFrom": "#f7f7f5",
+      "gradientVia": "#ffffff",
+      "gradientTo": "#f5f5f2",
+      "card": "#ffffff",
+      "cardHover": "#fafaf8",
+      "panel": "#ffffff",
+      "panelStrong": "#ffffff",
+      "muted": "#f5f5f2",
+      "accentSoft": "#edf1f6",
+      "border": "#e8e8e8",
+      "borderStrong": "#d6d6d3"
+    },
+    "text": {
+      "primary": "#1a1a1a",
+      "secondary": "#4f4f4f",
+      "brand": "#1b3a5c",
+      "accent": "#1b3a5c",
+      "muted": "#6b6b6b",
+      "onPrimary": "#ffffff",
+      "onHighlight": "#ffffff",
+      "onContrast": "#1b3a5c"
+    },
+    "semantic": {
+      "success": "#2e7d5b",
+      "warning": "#b45309",
+      "danger": "#c0392b"
+    },
+    "shell": {
+      "buttonText": "#ffffff",
+      "accentButtonText": "#ffffff",
+      "dockText": "#ffffff",
+      "icon": "#1b3a5c",
+      "shadow": "#dcdcd7",
+      "shadowStrong": "#c6c6c0"
+    }
+  },
+  "palette": {
+    "primary": "#1b3a5c",
+    "highlight": "#24486e",
+    "contrast": "#ffffff",
+    "secondary": "#24486e",
+    "accent": "#f5a623",
+    "primaryScale": {
+      "50": "#edf1f6",
+      "100": "#d8e1ea",
+      "200": "#b4c4d5",
+      "500": "#21456c",
+      "600": "#1b3a5c",
+      "700": "#15304d",
+      "900": "#0d2136"
+    },
+    "highlightScale": {
+      "50": "#eef3f8",
+      "100": "#dce6ef",
+      "200": "#bbcdde",
+      "500": "#2a517a",
+      "600": "#24486e",
+      "700": "#1d3c5c",
+      "900": "#122a42"
+    },
+    "surfaces": {
+      "page": "#f7f7f5",
+      "pageAlt": "#ffffff",
+      "gradientFrom": "#f7f7f5",
+      "gradientVia": "#ffffff",
+      "gradientTo": "#f5f5f2",
+      "card": "#ffffff",
+      "cardHover": "#fafaf8",
+      "panel": "#ffffff",
+      "panelStrong": "#ffffff",
+      "muted": "#f5f5f2",
+      "accentSoft": "#edf1f6",
+      "border": "#e8e8e8",
+      "borderStrong": "#d6d6d3"
+    },
+    "text": {
+      "primary": "#1a1a1a",
+      "secondary": "#4f4f4f",
+      "brand": "#1b3a5c",
+      "accent": "#1b3a5c",
+      "muted": "#6b6b6b",
+      "onPrimary": "#ffffff",
+      "onHighlight": "#ffffff",
+      "onContrast": "#1b3a5c"
+    },
+    "semantic": {
+      "success": "#2e7d5b",
+      "warning": "#b45309",
+      "danger": "#c0392b"
+    },
+    "shell": {
+      "buttonText": "#ffffff",
+      "accentButtonText": "#ffffff",
+      "dockText": "#ffffff",
+      "icon": "#1b3a5c",
+      "shadow": "#dcdcd7",
+      "shadowStrong": "#c6c6c0"
+    }
+  },
+  "pickedBrandColor": "#1b3a5c",
+  "typography": {
+    "font": "Inter",
+    "category": "sans-serif",
+    "weights": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "headingFont": "Inter",
+    "bodyFont": "Inter"
+  },
+  "heroVideoUrl": "https://storage.googleapis.com/audos-images/videos/scene_group_1785864545450_stitched.mp4"
+}

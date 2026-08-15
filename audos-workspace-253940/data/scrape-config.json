@@ -1,0 +1,306 @@
+{
+  "description": "Weekly refresh config for data/lenders.json. Each target is one lender product rate-card page. scripts/scrape-lenders.js fetches every target (unless enabled:false), extracts the fields with the regex patterns below (a per-target patterns object overrides defaultPatterns; a per-target fields array overrides defaults.fields), diffs against data/lenders.json, writes the updated file and regenerates data/lenders.ts. It then walks the `eligibility` block below and re-checks each lender's published minimum income, minimum CIBIL, business vintage, annual turnover and education collateral threshold from its own eligibility page. Those fields decide who the Loan Check ranking tells a borrower to apply to, so a difference is reported and HELD for review (logged and written to data/eligibility-drift.json), never written silently — see `eligibility.note`. LIVE AUTOMATION: a weekly platform schedule ('Weekly lender rate refresh') triggers the 'weekly-lender-refresh' server-function hook, which runs this same target list + guards server-side, writes fresh values into the WorkspaceDB table lender_rate_overrides, logs every change in lender_rate_updates, and posts the change log to the founder's chat. REACHES CUSTOMERS (wired 2026-08-12): lib/lender-rates-live.ts loads lender_rate_overrides once per page (a shared read \u2014 the rows are workspace-owned with session_id NULL) and layers the rows over the static data/lenders.ts bundle, so a weekly write reaches borrowers on their next page load with no republish. Both live surfaces \u2014 apps/LoanCheck and the loanley-compare chat card (components/LenderCompareCard.tsx) \u2014 pass that merged database to compareLenders(). The merge re-applies the `sanity` band below: a rate outside minPlausibleRatePct..maxPlausibleRatePct, a processing fee outside (0%, 10%], or a pair that would invert a lender's published range is dropped and the bundled value for that field stands; the newest row wins per lender+product; an empty or unreachable table renders exactly the bundled rates. apps/LenderRates is retired and unregistered \u2014 it is not the customer path. Updating data/lenders.json, regenerating data/lenders.ts (node scripts/scrape-lenders.js --sync) and republishing is still how the bundled baseline itself moves. Keep this file and the hook's embedded config in sync: after editing targets here, update the hook code via PATCH /api/workspaces/253940/hooks/{hookId}.",
+  "schedule": "weekly",
+  "requestDelayMs": 2500,
+  "userAgent": "Mozilla/5.0 (compatible; LoanleyRateMonitor/1.0; neutral rate-card monitor)",
+  "defaults": {
+    "fields": [
+      "interestRateMin",
+      "interestRateMax",
+      "processingFeePercent"
+    ]
+  },
+  "sanity": {
+    "minPlausibleRatePct": 4,
+    "maxPlausibleRatePct": 40,
+    "reviewThresholdPct": 3,
+    "note": "Extracted rates outside the plausible band are discarded. In the local script, changes larger than reviewThresholdPct are applied but flagged REVIEW in the log. In the live weekly hook, REVIEW changes (delta > reviewThresholdPct, or a rate more than 3pp outside the lib/loan-benchmarks band for the product) are HELD — recorded in lender_rate_updates with status 'review' and surfaced to the founder, never auto-applied."
+  },
+  "defaultPatterns": {
+    "rateRange": "(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%?\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%",
+    "rateOnwards": "(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:p\\.?a\\.?)?\\s*(?:onwards|\\*)",
+    "processingFeePercent": "(?:processing\\s+fee|processing\\s+charges?)[^%]{0,120}?(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"
+  },
+  "eligibility": {
+    "note": "Eligibility monitoring. minSalary, minCreditScore, minBusinessVintageMonths, minAnnualTurnover and collateralRequiredAboveAmount are what the Loan Check ranking filters borrowers on, so they are NEVER overwritten silently: scripts/scrape-lenders.js reports every difference between the lender page and data/lenders.json under 'Eligibility drift', writes it to data/eligibility-drift.json and keeps the stored value until a human confirms it and re-runs with --apply-eligibility. A wrong minimum here either sends a borrower to a lender that will reject them or hides one that would have said yes. 'no plausible X found' in the run log means the stored value could not be verified from the page — not that it is fine.",
+    "fields": [
+      "minSalary",
+      "minCreditScore"
+    ],
+    "reuseRateTargets": true,
+    "reuseRateTargetsNote": "Rate-card pages for personal, home and loan-against-property products also publish the minimum income and CIBIL, so every enabled rate target above doubles as an eligibility target for the default fields. Add eligibilityUrl / eligibilityFields / eligibilityEnabled to a rate target to point its eligibility check elsewhere. The explicit targets below win over the reused ones, and a target listed below with enabled:false is left unmonitored on purpose rather than falling back to the rate page.",
+    "policy": "hold",
+    "sanity": {
+      "minPlausibleSalary": 5000,
+      "maxPlausibleSalary": 500000,
+      "minPlausibleCreditScore": 550,
+      "maxPlausibleCreditScore": 800,
+      "minPlausibleVintageMonths": 6,
+      "maxPlausibleVintageMonths": 120,
+      "minPlausibleTurnover": 100000,
+      "maxPlausibleTurnover": 5000000000,
+      "minPlausibleCollateralThreshold": 100000,
+      "maxPlausibleCollateralThreshold": 100000000,
+      "note": "Extracted eligibility values outside these bands are discarded as page noise (nav labels, marketing copy, unrelated tables) and the stored value is kept and flagged unverified."
+    },
+    "patterns": {
+      "minSalary": [
+        "(?:minimum|min\\.?)\\s+(?:net\\s+)?(?:monthly\\s+)?(?:salary|income)[^0-9₹]{0,50}(?:₹|rs\\.?|inr)\\s*([\\d][\\d,]{2,11})(?:\\s*(lakh|lakhs|lac|lacs))?",
+        "(?:salary|monthly\\s+income|net\\s+income)[^0-9₹]{0,50}(?:₹|rs\\.?|inr)\\s*([\\d][\\d,]{2,11})(?:\\s*(lakh|lakhs|lac|lacs))?"
+      ],
+      "minCreditScore": [
+        "minimum\\s+acceptable\\s+(?:cibil\\s+|credit\\s+)?score[^0-9]{0,20}(\\d{3})",
+        "(?:minimum|min\\.?)\\s+(?:cibil|credit)\\s*score[^0-9]{0,40}(\\d{3})",
+        "(?:cibil|credit)\\s*score\\s*(?:of|is|:)?\\s*(\\d{3})\\s*(?:or\\s+(?:higher|above|more))?",
+        "(?:cibil|credit)\\s*score[^0-9]{0,25}(\\d{3})"
+      ],
+      "minBusinessVintageMonths": [
+        "(\\d{1,2}(?:\\.\\d)?)\\s*(years?|months?)\\s+in\\s+the\\s+current\\s+business",
+        "(?:business\\s+vintage|vintage|in\\s+business|business\\s+(?:continuity|experience|stability)|operational)[^0-9]{0,60}(\\d{1,2}(?:\\.\\d)?)\\s*(years?|months?)",
+        "(\\d{1,2}(?:\\.\\d)?)\\s*(years?|months?)\\s+(?:of\\s+)?(?:business\\s+)?(?:continuity|vintage|experience|stability|in\\s+business|business\\s+operations?)",
+        "(?:business|vintage)[^0-9]{0,80}?(?:at\\s+least|minimum(?:\\s+of)?)\\s*(\\d{1,2}(?:\\.\\d)?)\\s*(years?|months?)"
+      ],
+      "minAnnualTurnover": [
+        "turnover\\s*:\\s*(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores|cr)\\b",
+        "(?:minimum|min\\.?)\\s+(?:annual\\s+)?turnover[^0-9₹]{0,40}(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores|cr)\\b",
+        "(?:annual\\s+)?turnover\\s+of\\s+(?:at\\s+least\\s+)?(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores|cr)\\b",
+        "turnover[^0-9₹]{0,40}(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores|cr)\\b"
+      ],
+      "collateralRequiredAboveAmount": [
+        "(?:no|without)\\s+(?:tangible\\s+)?(?:collateral|security)[^0-9₹]{0,60}(?:up\\s*to|upto)\\s*(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores)\\b",
+        "(?:up\\s*to|upto)\\s*(?:₹|rs\\.?|inr)?\\s*([\\d][\\d,.]{0,11})\\s*(lakh|lakhs|lac|lacs|crore|crores)\\b[\\s\\S]{0,160}?(?:no\\s+(?:tangible\\s+)?(?:collateral|security)|without\\s+collateral)"
+      ]
+    },
+    "targets": [
+      {
+        "lenderId": "sbi",
+        "product": "education",
+        "url": "https://sbi.bank.in/web/personal-banking/loans/education-loans/student-loan-scheme",
+        "fields": [
+          "collateralRequiredAboveAmount"
+        ],
+        "note": "Student Loan Scheme page publishes the security threshold (no collateral up to ₹7.5 lakh, tangible collateral above). No student income or CIBIL minimum is published, so none is monitored."
+      },
+      {
+        "lenderId": "bank-of-baroda",
+        "product": "education",
+        "url": "https://bankofbaroda.bank.in/loans/education-loan/baroda-gyan",
+        "fields": [
+          "collateralRequiredAboveAmount"
+        ],
+        "note": "Baroda Gyan page publishes 'No security up to Rs.7.50 lakh'."
+      },
+      {
+        "lenderId": "pnb",
+        "product": "education",
+        "url": "https://www.pnb.bank.in/pnbsaraswatiloan.html",
+        "fields": [
+          "collateralRequiredAboveAmount"
+        ],
+        "note": "PNB Saraswati scheme page publishes the ₹7.50 lakh security threshold."
+      },
+      {
+        "lenderId": "canara",
+        "product": "education",
+        "url": "https://www.canarabank.bank.in/iba-model-education-loan-scheme",
+        "fields": [
+          "collateralRequiredAboveAmount"
+        ],
+        "note": "IBA Model Education Loan Scheme page publishes 'No Collateral for loan upto Rs 7.50 Lakhs'."
+      },
+      {
+        "lenderId": "icici",
+        "product": "education",
+        "url": "https://www.icici.bank.in/personal-banking/loans/education-loan",
+        "fields": [],
+        "note": "Nothing numeric to monitor: ICICI publishes acceptable security types and a mandatory co-borrower but no collateral threshold, no student CIBIL and no minimum co-applicant income. Add fields here if it ever publishes one."
+      },
+      {
+        "lenderId": "axis",
+        "product": "education",
+        "url": "https://www.axis.bank.in/loans/education-loan",
+        "fields": [],
+        "note": "Nothing numeric to monitor: Axis publishes unsecured limits per course list and 'collateral may be asked for appropriate cases', but no single threshold and no minimum co-applicant income."
+      },
+      {
+        "lenderId": "hdfc-bank",
+        "product": "business",
+        "url": "https://www.hdfcbank.com/personal/borrow/popular-loans/business-loan/eligibility",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minAnnualTurnover",
+          "minCreditScore"
+        ],
+        "note": "Publishes 3 years in the current business and ₹40 lakh turnover. minCreditScore is monitored deliberately even though the page publishes none — the run log then flags the stored 700 as unverified."
+      },
+      {
+        "lenderId": "icici",
+        "product": "business",
+        "url": "https://www.icici.bank.in/personal-banking/loans/personal-loan/business-instalment-loan",
+        "fields": [
+          "minBusinessVintageMonths"
+        ],
+        "note": "Business Instalment Loan page publishes a 3-year vintage; turnover is assessed from audited financials with no published figure."
+      },
+      {
+        "lenderId": "axis",
+        "product": "business",
+        "url": "https://www.axisbank.com/retail/loans/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minAnnualTurnover"
+        ],
+        "note": "Publishes 3 years under current ownership and ₹30 lakh turnover."
+      },
+      {
+        "lenderId": "kotak",
+        "product": "business",
+        "url": "https://www.kotak.bank.in/en/business/loans/business-loan/eligibility.html",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minAnnualTurnover"
+        ],
+        "note": "Publishes 3 years in business and ₹40 lakh turnover. No CIBIL minimum is published for this product."
+      },
+      {
+        "lenderId": "bajaj-finserv",
+        "product": "business",
+        "url": "https://www.bajajfinserv.in/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minCreditScore"
+        ],
+        "note": "Publishes 3-year vintage and CIBIL 650 for the business loan (its personal-loan minimum of 685 does not apply here)."
+      },
+      {
+        "lenderId": "tata-capital",
+        "product": "business",
+        "url": "https://www.tatacapital.com/business-loan.html",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minCreditScore"
+        ],
+        "note": "Business-owner criteria: 2 years of business continuity, CIBIL 675."
+      },
+      {
+        "lenderId": "lt-finance",
+        "product": "business",
+        "url": "https://www.ltfinance.com/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minAnnualTurnover"
+        ],
+        "note": "Publishes 3-year vintage and a ₹80 lakh to ₹500 crore turnover band; the 'turnover:' label pattern takes the ₹80 lakh floor, not the looser FAQ copy."
+      },
+      {
+        "lenderId": "hero-fincorp",
+        "product": "business",
+        "url": "https://www.herofincorp.com/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minCreditScore"
+        ],
+        "note": "Publishes 3 years operational and profitable, credit score 700 or higher."
+      },
+      {
+        "lenderId": "aditya-birla-finance",
+        "product": "business",
+        "url": "https://www.adityabirlacapital.com/loans/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minCreditScore"
+        ],
+        "note": "Publishes 2-year vintage and a minimum acceptable CIBIL of 675 (685 preferred) — the 'minimum acceptable' pattern must win over the preferred figure."
+      },
+      {
+        "lenderId": "shriram-finance",
+        "product": "business",
+        "url": "https://www.shriramfinance.in/business-loan",
+        "fields": [
+          "minBusinessVintageMonths"
+        ],
+        "note": "Publishes 3 years of business experience; explicitly lends to newer, low-turnover businesses and publishes no turnover minimum."
+      },
+      {
+        "lenderId": "poonawalla-fincorp",
+        "product": "business",
+        "url": "https://poonawallafincorp.com/business-loan",
+        "fields": [
+          "minBusinessVintageMonths",
+          "minAnnualTurnover"
+        ],
+        "note": "Publishes 2-year vintage and ₹6 lakh annual turnover. Its FAQ mentions a 'good CIBIL of 750', which is not an eligibility floor, so minCreditScore is not monitored from this page."
+      }
+    ]
+  },
+  "targets": [
+    {"lenderId":"sbi","product":"personal","url":"https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/personal-loans-schemes"},
+    {"lenderId":"sbi","product":"home","url":"https://sbi.co.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/home-loans-interest-rates-current"},
+    {"lenderId":"sbi","product":"education","url":"https://sbi.bank.in/web/interest-rates/interest-rates/loan-schemes-interest-rates/education-loan-scheme","fields":["interestRateMin"],"patterns":{"rateRange":"student\\s+loan\\s+scheme\\s+without\\s+collateral[^%]{0,60}(\\d{1,2}\\.\\d{2})\\s*%[^%]{0,60}(\\d{1,2}\\.\\d{2})\\s*%","rateOnwards":"student\\s+loan\\s+scheme\\s+without\\s+collateral\\s*\\(upto[^)]*\\)\\s*\\d{1,2}\\.\\d{2}\\s*%\\s*with\\s+collateral\\s*\\(above[^)]*\\)\\s*(\\d{1,2}\\.\\d{2})\\s*%"},"patternNote":"Re-enabled 2026-08-07: old /education-loan-scheme-interest-rate path 404s, new path is /education-loan-scheme. The page lists eight schemes (PM-Vidyalaxmi 6.90-8.40%, Scholar 6.90-7.65%, Skill 10.65%, Takeover 11.15%), so only the mainstream SBI STUDENT LOAN SCHEME with-collateral rate is scraped (9.40%); the widest-range default picked an unrelated Scholar takeover band"},
+    {"lenderId":"bank-of-baroda","product":"personal","url":"https://www.bankofbaroda.in/personal-banking/loans/personal-loan","fields":["interestRateMin"],"patterns":{"rateOnwards":"@\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*Interest"},"patternNote":"Rate appears only in the page title as 'Personal Loan @ 11% Interest'; fee text is unreliable, so only interestRateMin is scraped"},
+    {"lenderId":"bank-of-baroda","product":"home","url":"https://www.bankofbaroda.in/personal-banking/loans/home-loan","fields":["interestRateMin"],"patterns":{"rateOnwards":"starting\\s+(?:@|at)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Rate appears as 'starting @7.20%' in hero copy; only interestRateMin is scraped"},
+    {"lenderId":"bank-of-baroda","product":"education","url":"https://www.bankofbaroda.in/personal-banking/loans/education-loan","fields":["interestRateMin"],"patterns":{"rateRange":"education\\s+loans?[^%\\d]{0,40}(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"education\\s+loans?\\s+from\\s+bank\\s+of\\s+baroda\\s+starting\\s*@\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Tightened 2026-08-07: the page publishes 6.85% (= BRLLR 7.90% - 1.05% education spread) in hero copy and as the EMI-calculator default. Anchored on that sentence so the loose default cannot match the \"@ 0.00%\" template artifact next to it, and only interestRateMin is scraped"},
+    {"lenderId":"pnb","product":"personal","url":"https://pnb.bank.in/personalloanforpublic.html","enabled":false,"disabledReason":"Rates rendered client-side (JS) — URL fixed 2026-08-07: pnbindia.in moved to pnb.bank.in AND the old /personal-loan.html path is now a soft 404 (it answers HTTP 200 with Page-Not-Found.html, so a status check alone looks healthy). The real page is /personalloanforpublic.html, but its server HTML carries no rate text. Needs the web-scraping integration (Apify) to render JS"},
+    {"lenderId":"pnb","product":"home","url":"https://pnb.bank.in/housingloanforpublic.html","enabled":false,"disabledReason":"Rates rendered client-side (JS) — URL fixed 2026-08-07 to the real page (/housing-loan.html is a soft 404 answering HTTP 200 with Page-Not-Found.html); no rate text in server HTML. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"pnb","product":"education","url":"https://pnb.bank.in/pnb-pratibha-new-education-loan-scheme.html","enabled":false,"disabledReason":"Rates rendered client-side (JS) — URL fixed 2026-08-07 to the PNB Pratibha scheme page (/Education-loan.html is a soft 404 answering HTTP 200 with Page-Not-Found.html); no rate text in server HTML. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"canara","product":"personal","url":"https://www.canarabank.bank.in/pages/interest-rate-range-on-loans","patterns":{"rateRange":"canara\\s+budget\\s+(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: canarabank.com 404s; the bank moved to canarabank.bank.in and publishes one official 'Interest Rate Range on Loans and Advances Granted to Individuals under Retail Lending' table. Canara Budget is its personal-loan product, so the row label is the anchor (9.70% to 14.70%)"},
+    {"lenderId":"canara","product":"home","url":"https://www.canarabank.bank.in/pages/interest-rate-range-on-loans","patterns":{"rateRange":"housing\\s+loan\\s+(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: replaces the JS-rendered /pages/housing-loan page with the same official retail rate-range table, anchored on the Housing Loan row (7.15% to 10.00%)"},
+    {"lenderId":"canara","product":"education","url":"https://www.canarabank.bank.in/iba-model-education-loan-scheme","enabled":false,"disabledReason":"No published rate — rechecked 2026-08-07: canarabank.com 404s and the migrated canarabank.bank.in IBA Model Education Loan Scheme page publishes eligibility and the collateral threshold but no interest rate; the official retail rate-range table has no education row either. Kept as the eligibility source only"},
+    {"lenderId":"union-bank","product":"personal","url":"https://www.unionbankofindia.co.in/english/personal-retail-loan.aspx","enabled":false,"disabledReason":"Unreliable extraction — rechecked 2026-08-07: the generic retail page still yields 6.60% from a promo banner and publishes no per-product rate table; unionbank.bank.in does not resolve. No safe anchor available"},
+    {"lenderId":"union-bank","product":"home","url":"https://www.unionbankofindia.co.in/english/home-loan.aspx","enabled":false,"disabledReason":"Unreliable extraction — rechecked 2026-08-07: yields an implausible 6.60% from a promo banner and publishes no rate table"},
+    {"lenderId":"bank-of-india","product":"personal","url":"https://bankofindia.co.in/personal-loan","enabled":false,"disabledReason":"HTTP 403 — rechecked 2026-08-07 with both the monitor User-Agent and a standard desktop browser User-Agent, and on the migrated bankofindia.bank.in domain: all return 403, so this is real bot protection rather than UA filtering. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"bank-of-india","product":"home","url":"https://bankofindia.co.in/home-loan","enabled":false,"disabledReason":"HTTP 403 — rechecked 2026-08-07 with a browser User-Agent and on bankofindia.bank.in: still 403. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"indian-bank","product":"personal","url":"https://indianbank.bank.in/en/personal-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (indianbank.in 404s; the bank moved to indianbank.bank.in) but neither the product page nor /en/lending-rates carries a personal-loan rate in HTML: the rate ranges are published only as linked PDFs"},
+    {"lenderId":"indian-bank","product":"home","url":"https://indianbank.bank.in/en/home-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 to the migrated indianbank.bank.in domain, but the home-loan rate is published only in the linked PDFs under /en/lending-rates"},
+    {"lenderId":"hdfc-bank","product":"personal","url":"https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan/interest-rates-and-charges"},
+    {"lenderId":"hdfc-bank","product":"home","url":"https://www.hdfc.bank.in/home-loan","fields":["interestRateMin","interestRateMax"],"patterns":{"rateRange":"starting\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*\\*?\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: the hdfcbank.com path times out behind bot protection, but the migrated www.hdfc.bank.in domain serves the same rate card and publishes \"Starting at 7.75%* to 13.20%* p.a.\". Fee is not scraped — the only processing-fee text on the page is a 10-25% down-payment FAQ"},
+    {"lenderId":"hdfc-bank","product":"business","url":"https://www.hdfc.bank.in/business-loan","enabled":false,"disabledReason":"No published rate — 2026-08-07: the migrated www.hdfc.bank.in domain does get past the bot protection that times out hdfcbank.com/sme, but the business-loan page publishes only the 2% processing charge and no rate"},
+    {"lenderId":"hdfc-bank","product":"loan_against_property","url":"https://www.hdfc.bank.in/loan-against-property","fields":["interestRateMin","processingFeePercent"],"patterns":{"rateRange":"loan\\s+against\\s+property\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s+for\\s+loan\\s+against\\s+property\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: hdfcbank.com times out behind bot protection; www.hdfc.bank.in serves the page and publishes \"Interest rate for Loan Against Property Starting from 8.55%* p.a.\" No maximum is published, so only interestRateMin is scraped"},
+    {"lenderId":"icici","product":"personal","url":"https://www.icicibank.com/personal-banking/loans/personal-loan/personal-loan-interest-rates"},
+    {"lenderId":"icici","product":"home","url":"https://www.icicibank.com/personal-banking/loans/home-loan/interest-rates"},
+    {"lenderId":"icici","product":"education","url":"https://www.icici.bank.in/personal-banking/loans/education-loan","enabled":false,"disabledReason":"No published rate — diagnosed 2026-08-07: the 6.25% this used to extract is the \"Earn 6.25% p.a. on FCNR (B) Deposits\" promo in the site navigation, not a loan rate. The education-loan page publishes security types and co-borrower rules but no interest rate. Kept as the eligibility source only"},
+    {"lenderId":"icici","product":"business","url":"https://www.icici.bank.in/personal-banking/loans/personal-loan/business-instalment-loan","fields":["interestRateMin","processingFeePercent"],"patterns":{"rateRange":"interest\\s+rates\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rates?\\s+(?:from|starting\\s+from)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: /business-banking/loans/business-loan 404s. ICICI sells its unsecured business loan as the Business Instalment Loan (already this config's eligibility source for icici/business), which publishes \"Interest Rates from 13.25%*\" and a 2% processing fee. Anchored on that label so the navigation FCNR deposit promo cannot match; no maximum is published"},
+    {"lenderId":"icici","product":"loan_against_property","url":"https://www.icici.bank.in/personal-banking/loans/home-loan/loan-against-property","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (the old /personal-banking/loans/loan-against-property path now lives under /home-loan/), but the page publishes no LAP rate; the 6.25% it used to extract was the navigation FCNR deposit promo"},
+    {"lenderId":"axis","product":"personal","url":"https://www.axis.bank.in/loans/personal-loan/interest-rates-charges","patterns":{"rateRange":"(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*p\\.?\\s*a\\.?\\s*to\\s+a\\s+maximum\\s+of\\s+(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: axisbank.com 404s, the bank moved to axis.bank.in. Anchored on the published card range (\"ROI that ranges from a modest 9.99%p.a. to a maximum of 22% per annum\") because the loose default preferred the wider 8.90%-21.55% MCLR-spread row further down the page"},
+    {"lenderId":"axis","product":"home","url":"https://www.axis.bank.in/loans/home-loan/interest-rates-charges","patterns":{"rateRange":"(\\d{1,2}\\.\\d{2})\\s*%\\s*to\\s*\\d{1,2}\\.\\d{2}\\s*%\\s*p\\.?\\s*a\\.?[\\s\\S]{0,220}?\\d{1,2}\\.\\d{2}\\s*%\\s*to\\s*(\\d{1,2}\\.\\d{2})\\s*%\\s*p\\.?\\s*a\\.?"},"patternNote":"Pattern fixed 2026-08-07 (was writing wrong data): the loose default preferred ASHA Home Loan's 10.15%-11.90% band over the mainline CIBIL table, and the 2.15pp delta slipped under the review threshold, so 10.15-11.90 was silently applied to the live overrides. Now anchored on the two \"p.a.\"-suffixed CIBIL rows, taking the best-score floor and the no-history ceiling: 8.00%-9.10%. ASHA rows carry no \"p.a.\" suffix and can no longer match"},
+    {"lenderId":"axis","product":"education","url":"https://www.axis.bank.in/loans/education-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 to the migrated axis.bank.in domain, but the page publishes unsecured limits per course list and no interest rate; the fee pattern matched the 8% penal-interest clause. Kept as the eligibility source only"},
+    {"lenderId":"axis","product":"business","url":"https://www.axis.bank.in/loans/business-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (axisbank.com/business-banking/loans/business-loan 404s; the product now lives at axis.bank.in/loans/business-loan) but neither that page nor /business-banking/loans/business-loan publishes a rate. Kept as the eligibility source only"},
+    {"lenderId":"axis","product":"loan_against_property","url":"https://www.axis.bank.in/loans/loan-against-property","patterns":{"rateRange":"(\\d{1,2}\\.\\d{2})\\s*%\\s*(?:-|–|to)\\s*\\d{1,2}\\.\\d{2}\\s*%\\s*p\\.?\\s*a\\.?[\\s\\S]{0,240}?\\d{1,2}\\.\\d{2}\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}\\.\\d{2})\\s*%\\s*p\\.?\\s*a\\.?"},"patternNote":"Pattern fixed 2026-08-07: the loose default returned only the PSL row (9.15%-10.00%) and wrote 10.00 as the product maximum. Now anchored on both \"p.a.\"-suffixed floating rows, giving the PSL floor and the non-PSL ceiling: 9.15%-10.25%"},
+    {"lenderId":"kotak","product":"personal","url":"https://www.kotak.bank.in/en/personal-banking/loans/personal-loan.html","fields":["interestRateMin"],"patterns":{"rateRange":"personal\\s+loan\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"(\\d{1,2}\\.\\d{2})\\s*%\\s*p\\.?a\\.?\\s*\\*"},"patternNote":"Re-enabled 2026-08-07: kotak.com 404s, the bank moved to kotak.bank.in and the dedicated interest-rate page is gone. The product page publishes \"10.99% p.a.*\"; no maximum is published, so only interestRateMin is scraped"},
+    {"lenderId":"kotak","product":"home","url":"https://www.kotak.bank.in/en/personal-banking/loans/home-loan.html","fields":["interestRateMin"],"patterns":{"rateRange":"home\\s+loan\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"(\\d{1,2}\\.\\d{2})\\s*%\\s*\\*"},"patternNote":"Re-enabled 2026-08-07: kotak.com 404s; the migrated kotak.bank.in product page publishes \"7.60%*\". No maximum is published, so only interestRateMin is scraped"},
+    {"lenderId":"kotak","product":"business","url":"https://www.kotak.bank.in/en/business/loans/business-loan.html","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (kotak.com 404s; migrated to kotak.bank.in) but the business-loan page publishes only the 2% processing fee, and no interest-rate subpage exists. Kept as the eligibility source only"},
+    {"lenderId":"indusind","product":"personal","url":"https://www.indusind.com/in/en/personal/loans/personal-loan.html","fields":["interestRateMin"],"patterns":{"rateRange":"(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"starting\\s+(?:from|at)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Default loose range pattern matched junk ('4%'); page reliably shows 'Starting from 10.49%'. Fee text is a false positive, so only interestRateMin is scraped"},
+    {"lenderId":"indusind","product":"loan_against_property","url":"https://www.indusind.com/in/en/personal/loans/loan-against-property.html","enabled":false,"disabledReason":"No published rate — rechecked 2026-08-07: the page publishes no LAP rate and the 4% the default pattern found comes from the savings-account rate in the navigation"},
+    {"lenderId":"yes-bank","product":"personal","url":"https://www.yesbank.in/personal-banking/yes-individual/loans/personal-loan","enabled":false,"disabledReason":"Rate text exists only inside script tags (stripped before matching) — rechecked 2026-08-07; yesbank.bank.in does not resolve. Needs the web-scraping integration (Apify) to render JS"},
+    {"lenderId":"yes-bank","product":"home","url":"https://www.yesbank.in/personal-banking/yes-individual/loans/home-loan","enabled":false,"disabledReason":"Rate text exists only inside script tags (stripped before matching) — rechecked 2026-08-07. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"idfc-first","product":"personal","url":"https://www.idfcfirst.bank.in/personal-banking/loans/personal-loan/personal-loan-interest-rates","fields":["interestRateMin"],"patterns":{"rateRange":"firstmoney[^%\\d]{0,60}(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s+starting\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: idfcfirstbank.com 404s, the bank moved to idfcfirst.bank.in and the rate page is .../personal-loan/personal-loan-interest-rates. Anchored on \"interest rate starting at 9.99% p.a.\" because the page also quotes a market-wide \"10% to 24%\" FAQ range that is not IDFC's own rate"},
+    {"lenderId":"idfc-first","product":"home","url":"https://www.idfcfirst.bank.in/personal-banking/loans/home-loan/home-loan-interest-rates","fields":["interestRateMin"],"patterns":{"rateRange":"home\\s+loan\\s+roi[^%\\d]{0,40}(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"home\\s+loan\\s+roi\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"URL and pattern fixed 2026-08-07 (was writing wrong data): the old target pointed at the home-loan product page, which publishes no rate, so the default pattern picked up the \"Apply for Personal Loan Online Starting at 9.99%*\" cross-sell in the navigation and silently wrote 9.99 as the home-loan floor. Now anchored on the rate page's own \"Home Loan ROI starting from 7.75%*\" table row"},
+    {"lenderId":"federal","product":"personal","url":"https://www.federalbank.co.in/personal-loans","enabled":false,"disabledReason":"Rates rendered client-side (JS) — rechecked 2026-08-07: empty server HTML, and federalbank.bank.in does not resolve. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"federal","product":"home","url":"https://www.federalbank.co.in/housing-loan","enabled":false,"disabledReason":"Rates rendered client-side (JS) — rechecked 2026-08-07: empty server HTML. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"rbl","product":"personal","url":"https://www.rbl.bank.in/personal-banking/loans/personal-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (rblbank.com 404s; the bank moved to rbl.bank.in) but the product page publishes only the 2% processing fee, and /interest-rates carries just MCLR, Base Rate, PLR and RLLR. The personal-loan card rate is published only in a linked PDF"},
+    {"lenderId":"south-indian-bank","product":"personal","url":"https://www.southindianbank.com/content/personal-loan","enabled":false,"disabledReason":"HTTP 403 — rechecked 2026-08-07 with a standard desktop browser User-Agent and on southindianbank.bank.in: still 403, so this is real bot protection rather than UA filtering. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"south-indian-bank","product":"home","url":"https://www.southindianbank.com/content/home-loan","enabled":false,"disabledReason":"HTTP 403 — rechecked 2026-08-07 with a browser User-Agent and on southindianbank.bank.in: still 403. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"bajaj-finserv","product":"personal","url":"https://www.bajajfinserv.in/personal-loan-processing-fees-and-interest-rates","patterns":{"rateRange":"rate\\s+of\\s+interest\\s+per\\s+annum\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: /personal-loan-interest-rates-and-charges 404s, the page is now /personal-loan-processing-fees-and-interest-rates. Anchored on its official fee-schedule row \"Rate of interest per annum 10% to 30.5% per annum\" (processing fee 4.13%, inclusive of taxes)"},
+    {"lenderId":"bajaj-finserv","product":"home","url":"https://www.bajajfinserv.in/home-loan-interest-rates","fields":["interestRateMin","processingFeePercent"],"patterns":{"rateRange":"rate\\s+of\\s+interest\\s+per\\s+annum\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"home\\s+loan\\s+interest\\s+rates\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: bajajhousingfinance.in/home-loan-interest-rate 404s; Bajaj now publishes the home loan under bajajfinserv.in/home-loan-interest-rates (\"starting from 7.25% p.a. for salaried\"). No maximum is published, so only interestRateMin is scraped"},
+    {"lenderId":"bajaj-finserv","product":"business","url":"https://www.bajajfinserv.in/business-loan-interest-rate-and-charges","patterns":{"rateRange":"rate\\s+of\\s+interest\\s+per\\s+annum\\s+is\\s+in\\s+the\\s+range\\s+of\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Moved 2026-08-07 from the /business-loan product page to the dedicated fee schedule, which is authoritative: \"Rate of interest per annum is in the range of 14% - 23%\". Anchored on that row so the ECLGS 8.50%-13% line below it cannot match. The 23% ceiling is a 7pp drop from the stored 30%, so the first run will HOLD it for review rather than apply it"},
+    {"lenderId":"bajaj-finserv","product":"loan_against_property","url":"https://www.bajajfinserv.in/loan-against-property-fees-and-interest-rates","patterns":{"rateRange":"rate\\s+of\\s+interest\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*per\\s+annum"},"patternNote":"Moved 2026-08-07 from the /loan-against-property product page (whose hero copy says 8%-20%) to the dedicated fee schedule, which publishes \"Rate of interest 8% to 14% per annum\". The 14% ceiling is a 4pp drop from the stored 18%, so the first run will HOLD it for review"},
+    {"lenderId":"tata-capital","product":"personal","url":"https://www.tatacapital.com/personal-loan/rates-and-charges.html","patterns":{"rateRange":"interest\\s+rate\\s*(?:-->|\\s)*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s*(?:-->|\\s)*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*p\\.?a\\.?\\s*onwards"},"patternNote":"Pattern fixed 2026-08-07: the loose default matched the \"Take a Tata Capital Home Loan Lowest interest rates starting at 7.50%*\" cross-sell banner that appears on every Tata Capital page. Now anchored on this page's own rates table row (\"Interest rate 10.99% p.a. onwards\")"},
+    {"lenderId":"tata-capital","product":"home","url":"https://www.tatacapital.com/home-loan.html","patterns":{"rateRange":"interest\\s+rate\\s+(\\d{1,2}\\.\\d{2})\\s*%\\s*p\\.?\\s*a\\.?\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*p\\.?\\s*a\\.?","processingFeePercent":"processing\\s+fees?\\s*(?:-->|\\s)*(?:salaried[^%]{0,80})?up\\s+to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: the 30%-40% junk came from the loose default matching unrelated copy. Anchored on the fees-and-charges table row \"Interest Rate 8.00% p.a. - 13% p.a.\" (salaried) and its \"Processing fees Up to 3% of the loan amount + GST\""},
+    {"lenderId":"tata-capital","product":"business","url":"https://www.tatacapital.com/business-loan.html","patterns":{"rateRange":"rate\\s+of\\s+interest\\s*(?:-->|\\s)*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"rate\\s+of\\s+interest\\s*(?:-->|\\s)*starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Pattern fixed 2026-08-07: the loose default matched the home-loan cross-sell banner (7.50%). Now anchored on this page's own table row (\"Rate of interest Starting from 12% per annum\")"},
+    {"lenderId":"tata-capital","product":"loan_against_property","url":"https://www.tatacapital.com/loan-against-property.html","patterns":{"rateRange":"floating\\s+rates?\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"(?:rate\\s+of\\s+interest|interest\\s+rate)\\s*(?:-->|\\s)*starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Pattern tightened 2026-08-07: anchored on the floating band (\"floating rates from 9%-17%\") so the fixed-rate 13%-17% band on the same page cannot win the widest-range tie-break"},
+    {"lenderId":"lt-finance","product":"personal","url":"https://www.ltfinance.com/personal-loan-interest-rate","patterns":{"rateRange":"personal\\s+loan\\s+interest\\s+rates?[^%\\d]{0,60}(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: ltfs.com moved to ltfinance.com and the rate now has its own page, /personal-loan-interest-rate (\"Personal loan interest rates in India range from 10.50% to 24%\"), instead of being buried in JSON-LD script tags"},
+    {"lenderId":"lt-finance","product":"home","url":"https://www.ltfinance.com/home-loan-interest-rate","fields":["interestRateMin","processingFeePercent"],"patterns":{"rateRange":"home\\s+loan\\s+interest\\s+rate[^%\\d]{0,40}(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"home\\s+loan\\s+interest\\s+rate\\s+starting\\s*@\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: ltfs.com/our-products/home-loans 404s; the page is now ltfinance.com/home-loan-interest-rate (\"Starting @ 8.70%*\"). No maximum is published, so only interestRateMin is scraped"},
+    {"lenderId":"lt-finance","product":"business","url":"https://www.ltfinance.com/business-loan-interest-rate","fields":["interestRateMin","processingFeePercent"],"patterns":{"rateRange":"business\\s+loan\\s+minimum\\s+interest\\s+rate\\s+starts\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"business\\s+loan\\s+minimum\\s+interest\\s+rate\\s+starts\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: ltfs.com/our-products/sme-loans 404s; the page is now ltfinance.com/business-loan-interest-rate. Anchored on \"our current business loan minimum interest rate starts at 11.25% p.a. for professionals\" so the market-wide \"9% and 26%\" FAQ range cannot match. The 11.25 floor is a 1.75pp drop from the stored 13%"},
+    {"lenderId":"muthoot-finance","product":"personal","url":"https://www.muthootfinance.com/personal-loan","enabled":false,"disabledReason":"Rates rendered client-side (JS) — rechecked 2026-08-07: only CSS percentages in the server HTML. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"hero-fincorp","product":"personal","url":"https://www.herofincorp.com/personal-loan-interest-rates","enabled":false,"disabledReason":"Rate rendered client-side (JS) — URL fixed 2026-08-07 (/personal-loan 404s; the rate page is /personal-loan-interest-rates) but its \"Interest Rate Min % Max %\" fields are populated by JS and the server HTML carries no figures. Needs the web-scraping integration (Apify)"},
+    {"lenderId":"hero-fincorp","product":"business","url":"https://www.herofincorp.com/business-loan-interest-rates","fields":["interestRateMin"],"patterns":{"rateRange":"interest\\s+rate\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s+starting\\s+from\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*p\\.?\\s*a\\.?"},"patternNote":"Re-enabled 2026-08-07: /unsecured-business-loan 404s; the rate page is /business-loan-interest-rates. Anchored on its own fee table (\"Interest Rate Starting from 14% P.A.\") so the market-wide \"14% to 30% per annum for self-employed\" FAQ copy cannot match"},
+    {"lenderId":"aditya-birla-finance","product":"personal","url":"https://www.adityabirlacapital.com/abcd/personal-finance/personal-loan/interest-rates","fields":["interestRateMin"],"patterns":{"rateRange":"charges\\s+starting\\s*@\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"charges\\s+starting\\s*@\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: finance.adityabirlacapital.com 404s; the product moved to adityabirlacapital.com/abcd/personal-finance/personal-loan/interest-rates. The only rate on the page is the title (\"Personal Loan Interest Rates & Charges Starting @10.99%\") — the body carries just EMI-calculator slider labels (\"Rate of Interest (9 to 13%)\"), which is what the loose default was matching, so only interestRateMin is scraped"},
+    {"lenderId":"aditya-birla-finance","product":"home","url":"https://www.adityabirlacapital.com/abcd/housing-finance/home-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07: homefinance.adityabirlacapital.com returns 406 to every client (rechecked with a browser User-Agent), and the reachable adityabirlacapital.com/abcd/housing-finance/home-loan page publishes only EMI-calculator slider labels (\"Rate of Interest (7 to 25%)\", \"EMI @ 9%\"), not a rate"},
+    {"lenderId":"aditya-birla-finance","product":"business","url":"https://www.adityabirlacapital.com/abcd/business-loan","enabled":false,"disabledReason":"No published rate — URL fixed 2026-08-07 (finance.adityabirlacapital.com/business-loan 404s) but the migrated page publishes only the up-to-3% processing fee and EMI-calculator slider labels. Kept as the eligibility source only"},
+    {"lenderId":"aditya-birla-finance","product":"loan_against_property","url":"https://www.adityabirlacapital.com/abcd/housing-finance/loan-against-property","patterns":{"rateRange":"interest\\s+rate\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"URL and pattern updated 2026-08-07: finance.adityabirlacapital.com now redirects to adityabirlacapital.com/abcd/housing-finance/loan-against-property. Anchored on the \"Interest rate\" row of the product-comparison table (9.35%-17.5% p.a. for LAP) so the neighbouring columns for other products cannot win the widest-range tie-break"},
+    {"lenderId":"shriram-finance","product":"personal","url":"https://www.shriramfinance.in/personal-loan","fields":["interestRateMin"],"patterns":{"rateRange":"interest\\s+rates\\s+starting\\s+just\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rates\\s+starting\\s+just\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Tightened 2026-08-07: the fee pattern was matching the flattened charges table header and returning 11% (the interest rate) as the processing fee — discarded by the >10% guard, but only by luck. Fee is no longer scraped; the published \"Up to 5%*\" stays as the stored value"},
+    {"lenderId":"shriram-finance","product":"business","url":"https://www.shriramfinance.in/business-loan","fields":["interestRateMin"],"patterns":{"rateRange":"interest\\s+rates\\s+starting\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"competitive\\s+interest\\s+rates\\s+starting\\s+at\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: the 10% processing fee was the same flattened-table false positive as shriram/personal, so the fee is no longer scraped. The page publishes \"Starting from 10%* p.a.\" twice (quick-facts table and features block); that is a 5pp drop from the stored 15%, so the first run will HOLD it for review"},
+    {"lenderId":"poonawalla-fincorp","product":"personal","url":"https://poonawallafincorp.com/personal-loan/interest-rate-and-charges","patterns":{"rateRange":"interest\\s+rate\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*\\*?\\s*p\\.?\\s*a\\.?\\s*onwards","processingFeePercent":"processing\\s+fees?\\s*(?:\\([^)]{0,30}\\))?\\s*up\\s+to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Re-enabled 2026-08-07: /personal-loan/fees-charges 404s, the page is /personal-loan/interest-rate-and-charges. Anchored on its table (\"Interest Rate 9.99%* p.a. onwards\", \"Processing Fees (Non-Refundable) Up to 4%\") — note the neighbouring /instant-personal-loan pages publish a different product at 16%, and the untightened fee pattern matched \"ranging from 0% to 3%\""},
+    {"lenderId":"poonawalla-fincorp","product":"business","url":"https://poonawallafincorp.com/business-loan","patterns":{"rateRange":"interest\\s+rate\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*(?:-|–|to)\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%","rateOnwards":"interest\\s+rate\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%\\s*\\*?\\s*p\\.?\\s*a\\.?\\s*onwards","processingFeePercent":"processing\\s+fees?\\s*(?:\\([^)]{0,30}\\))?\\s*up\\s+to\\s*(\\d{1,2}(?:\\.\\d{1,2})?)\\s*%"},"patternNote":"Tightened 2026-08-07: anchored on the page's own table (\"Interest Rate 15%* p.a. onwards\", \"Loan Processing Fees Up to 3%\") rather than the page title, so a change of hero copy cannot move the rate"}
+  ]
+}
